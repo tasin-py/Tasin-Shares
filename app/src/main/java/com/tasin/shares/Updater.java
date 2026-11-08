@@ -73,9 +73,10 @@ final class Updater {
                 c.disconnect();
                 if (code == 404) throw new IOException("The GitHub repository " + REPO + " was not found.");
                 if (code / 100 != 3 || location == null) throw new IOException("GitHub answered " + code + ".");
+                android.util.Log.i("TasinShares", "update check: " + code + " -> " + location);
                 int at = location.indexOf("/releases/tag/");
-                if (at < 0) throw new IOException("No release has been published yet.");
-                String rawTag = Uri.decode(location.substring(at + "/releases/tag/".length()));
+                String rawTag = at < 0 ? apiTag() : Uri.decode(location.substring(at + "/releases/tag/".length()));
+                if (rawTag == null) throw new IOException("No release has been published yet.");
                 String tag = rawTag.replaceFirst("^[vV]", "");
                 latest = tag;
                 if (compare(tag, current(app)) <= 0) {
@@ -129,6 +130,22 @@ final class Updater {
                 fail("Could not start the installer. " + reason(e));
             }
         }, "update-install").start();
+    }
+
+    /** The newest release's tag from the API, as a fallback when the web link names none (60 requests an hour per IP). */
+    private static String apiTag() {
+        try {
+            HttpURLConnection c = open("https://api.github.com/repos/" + REPO + "/releases/latest");
+            c.setRequestProperty("Accept", "application/vnd.github+json");
+            int code = c.getResponseCode();
+            android.util.Log.i("TasinShares", "update check (api): " + code);
+            if (code != 200) return null;
+            java.util.Scanner sc = new java.util.Scanner(c.getInputStream(), "UTF-8").useDelimiter("\\A");
+            String tag = new org.json.JSONObject(sc.hasNext() ? sc.next() : "{}").optString("tag_name", "");
+            return tag.isEmpty() ? null : tag;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /** The downloaded APK, where both adb's shell and the app's own provider can read it. */
