@@ -1,0 +1,51 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    aaptOptions {
+        // The scrcpy server is copied to the TV byte for byte; keep it uncompressed in the APK.
+        noCompress += ["jar"]
+    }
+    namespace 'com.tasin.shares'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'com.tasin.shares'
+        minSdk 26
+        targetSdk 34
+        versionCode 3
+        versionName '2.1'
+    }
+
+    buildTypes {
+        release {
+            // FtpServer and MINA load classes by name; keep everything rather than maintain keep rules.
+            minifyEnabled false
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all { outputFileName = 'TasinShares.apk' }
+    }
+
+    packagingOptions {
+        resources {
+            excludes += ['META-INF/DEPENDENCIES', 'META-INF/LICENSE*', 'META-INF/NOTICE*', 'META-INF/*.version']
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'org.nanohttpd:nanohttpd:2.3.1'
+    implementation 'org.nanohttpd:nanohttpd-websocket:2.3.1'
+    implementation 'org.apache.ftpserver:ftpserver-core:1.2.0'
+    implementation 'org.slf4j:slf4j-nop:1.7.36'
+    implementation 'com.google.zxing:core:3.5.3'
+}

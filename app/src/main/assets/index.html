@@ -1,0 +1,1176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Control this TV from your phone or computer: the remote, its screen, its apps and its files.">
+<meta name="theme-color" content="#120c09">
+<title>Tasin Shares</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='18 18 72 72'%3E%3Crect x='18' y='18' width='72' height='72' rx='18' fill='%23120C09'/%3E%3Cpath d='M65.33,35.14A22,22 0 0,0 42.67,35.14M72.86,65.33A22,22 0 0,0 72.86,42.67M42.67,72.86A22,22 0 0,0 65.33,72.86M35.14,42.67A22,22 0 0,0 35.14,65.33' stroke='%23F3EDE4' stroke-width='7' stroke-linecap='round' fill='none'/%3E%3Cpath d='M43.5,54a10.5,10.5 0 1,0 21.0,0a10.5,10.5 0 1,0 -21.0,0z' fill='%23F26B1D'/%3E%3C/svg%3E">
+<script>try { var t = localStorage.getItem('ts-theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}</script>
+<style>
+/* Hallmark · shape: app screen · genre: atmospheric · theme: Kiln (deal 3/3, seed cinematic-dark-remote-control-9d6d·2d2a3908·2026-11-08·r0) · redesign: full
+ * nav: kept shell, a top bar with the wordmark, a live status chip and the pop-out · signature: the pairing code in large tabular figures, and the ember OK at the centre of the remote's ring; the Apps view is a shelf of full-bleed banners that lift on hover, square icons set over their own blurred glow · states: connect, waiting, busy, live, loading, empty · kiln: ember, the device's own system font for every role (at the owner's request)
+ * axes: dark/high-contrast-serif/warm · posture: full-palette · contrast: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H5 E4 S4 R5 V4 · weakest: S, a remote looks like any remote; the code and the OK key carry the theme's figures and its one ember fill */
+/* Hallmark · waive 28b · a live stream from the TV, no frame exists before the first keyframe arrives · the stage shows its own message until the TV screen plays */
+/* Hallmark · answered F4 · the fullscreen buttons are a scrim over the TV picture, not a filled primary; Save is the page's one ember button, and the coffee dialog's link is the one filled action inside its own modal */
+/* Hallmark · answered F7 · every selector in the shared recipe is a control (tool, chip, bar and dialog buttons, the upload label), and pills are the theme's control shape */
+:root {
+  color-scheme: dark;
+  --space-3xs: 2px; --space-2xs: 4px; --space-xs: 8px; --space-sm: 12px; --space-md: 16px; --space-lg: 24px; --space-xl: 40px; --space-2xl: 64px; --space-3xl: 96px;
+  --text-xs: 0.75rem; --text-sm: 0.875rem; --text-md: 1rem; --text-lg: 1.2rem; --text-xl: 1.44rem; --text-2xl: 1.728rem; --text-3xl: 2.074rem;
+  --text-display: clamp(2.2rem, 8vw, 3rem); --text-code: clamp(3.2rem, 16vw, 4.8rem);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1); --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --dur-micro: 120ms; --dur-short: 220ms; --dur-long: 420ms;
+  --z-raised: 10; --z-toast: 500;
+  --color-paper: oklch(13% 0.012 40); --color-paper-2: oklch(17.5% 0.016 40); --color-paper-3: oklch(22% 0.018 40); --color-paper-4: oklch(27% 0.02 40);
+  --color-stage: oklch(9% 0.008 40); --color-scrim: oklch(13% 0.012 40 / 0.6);
+  --color-ink: oklch(94% 0.02 80); --color-ink-2: oklch(84% 0.025 70); --color-muted: oklch(72% 0.03 60);
+  --color-rule: oklch(96% 0.01 80 / 0.12); --color-sheen: oklch(98% 0.01 80 / 0.06); --color-shadow: oklch(4% 0.01 40 / 0.7);
+  --color-accent: oklch(70% 0.2 45); --color-accent-2: oklch(75% 0.19 50); --color-accent-ink: oklch(14% 0.02 40); --color-focus: oklch(76% 0.19 56);
+  --color-ok: oklch(76% 0.13 150); --color-warn: oklch(82% 0.13 80); --color-error: oklch(72% 0.15 27);
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; --font-display: var(--font-body);
+  --radius-card: 28px; --radius-well: 16px; --radius-pill: 999px; --rule-hair: 1px;
+  --tracking-display: -0.02em;
+  --app-max: 1180px; --remote-w: 340px; --control: 40px; --key: 48px;
+  --color-qr: oklch(99.5% 0.003 75); --swatch-ember: oklch(70% 0.2 45); --swatch-ocean: oklch(70% 0.15 240); --swatch-forest: oklch(72% 0.16 155); --swatch-dark: oklch(93% 0.006 260); --swatch-light: oklch(96% 0.01 75);
+}
+/* themes: each block re-points the colour tokens; Ember is :root itself */
+:root[data-theme="ocean"] {
+  --color-paper: oklch(13% 0.015 245); --color-paper-2: oklch(17.5% 0.02 245); --color-paper-3: oklch(22% 0.022 245); --color-paper-4: oklch(27% 0.024 245);
+  --color-stage: oklch(9% 0.01 245); --color-scrim: oklch(13% 0.015 245 / 0.6);
+  --color-ink: oklch(95% 0.012 240); --color-ink-2: oklch(85% 0.02 240); --color-muted: oklch(72% 0.03 240);
+  --color-accent: oklch(70% 0.15 240); --color-accent-2: oklch(75% 0.14 240); --color-accent-ink: oklch(14% 0.03 245); --color-focus: oklch(78% 0.14 235);
+}
+:root[data-theme="forest"] {
+  --color-paper: oklch(13% 0.014 155); --color-paper-2: oklch(17.5% 0.018 155); --color-paper-3: oklch(22% 0.02 155); --color-paper-4: oklch(27% 0.022 155);
+  --color-stage: oklch(9% 0.01 155); --color-scrim: oklch(13% 0.014 155 / 0.6);
+  --color-ink: oklch(95% 0.012 150); --color-ink-2: oklch(85% 0.02 150); --color-muted: oklch(72% 0.03 150);
+  --color-accent: oklch(72% 0.16 155); --color-accent-2: oklch(77% 0.15 155); --color-accent-ink: oklch(15% 0.03 155); --color-focus: oklch(80% 0.15 150);
+}
+:root[data-theme="dark"] {
+  --color-paper: oklch(14% 0.006 260); --color-paper-2: oklch(18.5% 0.006 260); --color-paper-3: oklch(23% 0.006 260); --color-paper-4: oklch(28% 0.006 260);
+  --color-stage: oklch(9% 0.006 260); --color-scrim: oklch(14% 0.006 260 / 0.6);
+  --color-ink: oklch(96% 0.006 260); --color-ink-2: oklch(86% 0.006 260); --color-muted: oklch(72% 0.006 260);
+  --color-accent: oklch(93% 0.006 260); --color-accent-2: oklch(98% 0.006 260); --color-accent-ink: oklch(15% 0.006 260); --color-focus: oklch(82% 0.14 80);
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --color-paper: oklch(96.5% 0.01 75); --color-paper-2: oklch(99.4% 0.004 75); --color-paper-3: oklch(93% 0.012 70); --color-paper-4: oklch(89% 0.014 70);
+  --color-stage: oklch(14% 0.01 40); --color-scrim: oklch(14% 0.01 40 / 0.6);
+  --color-ink: oklch(20% 0.02 50); --color-ink-2: oklch(32% 0.02 50); --color-muted: oklch(46% 0.025 55);
+  --color-rule: oklch(20% 0.02 50 / 0.14); --color-sheen: oklch(100% 0 0 / 0.6); --color-shadow: oklch(30% 0.02 50 / 0.25);
+  --color-accent: oklch(54% 0.17 42); --color-accent-2: oklch(49% 0.16 42); --color-accent-ink: oklch(99% 0.005 75); --color-focus: oklch(55% 0.18 45);
+  --color-ok: oklch(50% 0.13 150); --color-warn: oklch(55% 0.12 75); --color-error: oklch(52% 0.17 27);
+}
+*, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { overflow-x: clip; }
+html { scrollbar-color: var(--color-muted) var(--color-paper); }
+body { margin: 0; padding: 0 var(--space-md) var(--space-lg); background: var(--color-paper); color: var(--color-ink); font-family: var(--font-body); font-size: var(--text-md); line-height: 1.5; -webkit-font-smoothing: antialiased; caret-color: var(--color-accent); }
+::selection { background: color-mix(in oklab, var(--color-accent) 35%, transparent); }
+:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+h1, h2 { margin: 0; font-family: var(--font-display); font-weight: 650; letter-spacing: var(--tracking-display); line-height: 1.04; overflow-wrap: break-word; min-width: 0; text-wrap: balance; }
+p { margin: 0; text-wrap: pretty; }
+button, select, input { font: inherit; color: inherit; }
+svg { width: 20px; height: 20px; fill: currentColor; display: block; flex: none; }
+.hidden, [hidden] { display: none !important; }
+/* Holding a key is a long press on the TV, not a text selection or the phone's callout menu. */
+button, .remote, .remote *, #stage, header { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+
+/* controls: one recipe, three weights */
+button { border: 0; background: none; padding: 0; cursor: pointer; touch-action: manipulation; }
+.btn, .tools button, .tools label, .bar button, #cancelBtn, #retryBtn, #opwClear, #ownerBtn, .owner button {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-xs); min-height: var(--control); padding: 0 var(--space-md);
+  border-radius: var(--radius-pill); background: var(--color-paper-2); color: var(--color-ink); box-shadow: inset 0 0 0 var(--rule-hair) var(--color-rule);
+  font-size: var(--text-sm); font-weight: 500; white-space: nowrap; cursor: pointer;
+  transition: background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out), transform var(--dur-micro) var(--ease-out);
+}
+.primary {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 50px; padding: 0 var(--space-lg); border-radius: var(--radius-pill);
+  background: var(--color-accent); color: var(--color-accent-ink); font-weight: 600; white-space: nowrap;
+  transition: background-color var(--dur-short) var(--ease-out), transform var(--dur-micro) var(--ease-out);
+}
+@media (hover: hover) {
+  .btn:hover, .tools button:hover, .tools label:hover, .bar button:hover, #cancelBtn:hover, #retryBtn:hover, #opwClear:hover, #ownerBtn:hover, .owner button:hover { background: var(--color-paper-3); }
+  .primary:hover { background: var(--color-accent-2); }
+}
+button:active, .tools label:active { transform: translateY(1px); }
+button:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+.bar button.on, #kbdBtn.on { background: var(--color-accent); color: var(--color-accent-ink); box-shadow: none; }
+
+/* fields */
+.field { display: grid; gap: var(--space-xs); }
+.field input { width: 100%; min-width: 0; }
+.field label, .label { font-size: var(--text-sm); font-weight: 500; color: var(--color-muted); }
+input, select {
+  min-height: 48px; padding: 0 var(--space-md); border: var(--rule-hair) solid var(--color-muted); border-radius: var(--radius-well);
+  background: var(--color-paper); color: var(--color-ink); font-size: var(--text-md);
+  outline: 2px solid transparent; outline-offset: -3px; transition: background-color var(--dur-short) var(--ease-out);
+}
+input::placeholder { color: var(--color-muted); }
+@media (hover: hover) { input:hover, select:hover { background: var(--color-paper-2); } }
+input:focus-visible, select:focus-visible { outline-color: var(--color-focus); outline-offset: -3px; }
+input:disabled, select:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* the top bar */
+header { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-md) 0; }
+header h1 { font-size: var(--text-xl); line-height: 1; white-space: nowrap; }
+#status { display: inline-flex; align-items: center; gap: var(--space-xs); min-width: 0; padding: var(--space-2xs) var(--space-sm); border-radius: var(--radius-pill); background: var(--color-paper-2); box-shadow: inset 0 0 0 var(--rule-hair) var(--color-rule); color: var(--color-ink-2); font-size: var(--text-sm); }
+#status span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-muted); flex: none; }
+header .sp { flex: 1; }
+.icon { position: relative; width: var(--control); height: var(--control); display: grid; place-items: center; border-radius: var(--radius-pill); color: var(--color-ink-2); transition: background-color var(--dur-short) var(--ease-out); }
+.icon::before { content: ""; position: absolute; inset: -4px; }
+@media (hover: hover) { .icon:hover { background: var(--color-paper-2); } }
+
+/* the shell: phone stacks the remote over the tabs; a wide screen puts them side by side */
+#app { max-width: var(--app-max); margin-inline: auto; }
+main { display: grid; gap: var(--space-lg); }
+.panel { margin-top: var(--space-xl); min-width: 0; }
+@media (min-width: 60rem) {
+  body { padding: 0 var(--space-xl) var(--space-xl); }
+  #app { display: grid; grid-template-columns: var(--remote-w) minmax(0, 1fr); grid-template-areas: "top top" "main panel"; column-gap: var(--space-2xl); align-items: start; }
+  header { grid-area: top; padding: var(--space-lg) 0; }
+  main { grid-area: main; }
+  .panel { grid-area: panel; margin-top: 0; }
+  #app:has(main.with-screen) { grid-template-columns: minmax(0, 1fr); grid-template-areas: "top" "main" "panel"; }
+  main.with-screen { grid-template-columns: minmax(0, 1fr) var(--remote-w); column-gap: var(--space-xl); align-items: start; }
+  main.with-screen + .panel { margin-top: var(--space-2xl); }
+}
+
+/* the TV screen */
+.screen { border-radius: var(--radius-card); overflow: hidden; background: var(--color-paper-2); box-shadow: inset 0 0 0 var(--rule-hair) var(--color-rule); }
+.stage { position: relative; background: var(--color-stage); aspect-ratio: 16/9; outline: none; }
+.stage video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; cursor: default; touch-action: none; }
+.stage .msg { position: absolute; inset: 0; display: grid; place-items: center; color: var(--color-muted); text-align: center; padding: var(--space-lg); font-size: var(--text-sm); pointer-events: none; }
+.stage.capturing { box-shadow: inset 0 0 0 2px var(--color-focus); }
+.stage:fullscreen { aspect-ratio: auto; width: 100%; height: 100%; }
+.stage .fsbar { position: absolute; top: var(--space-sm); right: var(--space-sm); display: none; gap: var(--space-xs); }
+.stage:fullscreen .fsbar { display: flex; }
+.stage .fsbar button { width: var(--control); height: var(--control); display: grid; place-items: center; border-radius: var(--radius-pill); background: var(--color-scrim); color: var(--color-ink); }
+.bar { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; padding: var(--space-sm); }
+.bar select { min-height: var(--control); border-radius: var(--radius-pill); font-size: var(--text-sm); }
+.bar .sp { flex: 1; }
+.bar #fsBtn { width: var(--control); padding: 0; }
+.hint { color: var(--color-muted); font-size: var(--text-sm); }
+.num { font-variant-numeric: tabular-nums; }
+
+/* the remote: one smoked well, the ring at its centre */
+.remote { width: 100%; padding: var(--space-lg); border-radius: var(--radius-card); background: var(--color-paper-2); box-shadow: inset 0 0 0 var(--rule-hair) var(--color-rule); }
+.rrow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-xs); margin-bottom: var(--space-xs); }
+.rrow.r4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.rk { height: var(--key); display: grid; place-items: center; border-radius: var(--radius-pill); background: var(--color-paper-3); color: var(--color-ink); transition: background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out), transform var(--dur-micro) var(--ease-out); }
+@media (hover: hover) { .rk:hover { background: var(--color-paper-4); } }
+.rk.on { background: var(--color-accent); color: var(--color-accent-ink); }
+.rgap { height: var(--space-sm); }
+.pad { position: relative; width: 236px; aspect-ratio: 1; margin: var(--space-md) auto var(--space-lg); border-radius: 50%; background: var(--color-paper-3); }
+.pad button { position: absolute; display: grid; place-items: center; border-radius: 50%; color: var(--color-ink-2); transition: background-color var(--dur-short) var(--ease-out), transform var(--dur-micro) var(--ease-out); }
+@media (hover: hover) { .pad button:not(.ok):hover { background: var(--color-paper-4); } }
+.pad button:active { transform: scale(0.96); }
+.pad svg { width: 26px; height: 26px; }
+.pad .u, .pad .d { left: 33%; width: 34%; height: 33%; } .pad .u { top: 0; } .pad .d { bottom: 0; }
+.pad .l, .pad .r { top: 33%; width: 33%; height: 34%; } .pad .l { left: 0; } .pad .r { right: 0; }
+.pad .ok { left: 31%; top: 31%; width: 38%; height: 38%; background: var(--color-accent); color: var(--color-accent-ink); font-weight: 600; font-size: var(--text-lg); }
+@media (hover: hover) { .pad .ok:hover { background: var(--color-accent-2); } }
+.type { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-xs); margin-top: var(--space-md); }
+.type input { min-height: var(--key); border-radius: var(--radius-pill); }
+.type button { min-height: var(--key); }
+
+/* tabs and the views under them */
+.tabs { display: inline-flex; gap: var(--space-2xs); padding: var(--space-2xs); margin-bottom: var(--space-lg); border-radius: var(--radius-pill); background: var(--color-paper-2); box-shadow: inset 0 0 0 var(--rule-hair) var(--color-rule); }
+.tabs button { min-height: var(--control); padding: 0 var(--space-lg); border-radius: var(--radius-pill); color: var(--color-muted); font-size: var(--text-sm); font-weight: 500; transition: background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out); }
+@media (hover: hover) { .tabs button:hover { color: var(--color-ink); } }
+.tabs button.on { background: var(--color-paper-4); color: var(--color-ink); }
+.view { display: none; } .view.on { display: block; }
+
+/* apps: the sources, then the shelf of installed apps */
+.shelf-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-sm) var(--space-md); margin-bottom: var(--space-md); min-height: var(--control); }
+.shelf-head h2 { font-size: var(--text-lg); line-height: 1.2; }
+.shelf-head .count { margin-left: var(--space-xs); color: var(--color-muted); font-size: var(--text-sm); font-weight: 500; letter-spacing: 0; }
+.sources { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5rem), 1fr)); gap: var(--space-xs); margin-bottom: var(--space-xl); }
+.sources button { display: flex; align-items: center; gap: var(--space-sm); min-height: 56px; padding: 0 var(--space-md); border-radius: var(--radius-well); background: var(--color-paper-2); box-shadow: inset 0 0 0 var(--rule-hair) var(--color-rule), inset 0 1px 0 var(--color-sheen); font-size: var(--text-sm); font-weight: 500; text-align: left; transition: background-color var(--dur-short) var(--ease-out), transform var(--dur-micro) var(--ease-out); }
+.sources button span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sources svg { width: 22px; height: 22px; color: var(--color-muted); transition: color var(--dur-short) var(--ease-out); }
+@media (hover: hover) { .sources button:hover { background: var(--color-paper-3); } .sources button:hover svg { color: var(--color-ink); } }
+.sources .ghost { min-height: 56px; border-radius: var(--radius-well); background: var(--color-paper-2); animation: breathe 1.4s var(--ease-out) infinite alternate; }
+.find { position: relative; flex: 0 1 16rem; min-width: 0; }
+.find svg { position: absolute; left: var(--space-sm); top: 50%; width: 18px; height: 18px; transform: translateY(-50%); color: var(--color-muted); pointer-events: none; }
+.find input { width: 100%; min-height: var(--control); padding-left: var(--space-xl); border-radius: var(--radius-pill); font-size: var(--text-sm); }
+
+.apps { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr)); gap: var(--space-lg) var(--space-md); }
+.app { position: relative; display: grid; gap: var(--space-xs); align-content: start; min-width: 0; text-align: left; color: var(--color-ink-2); border-radius: var(--radius-well); }
+.app:focus-visible { outline-offset: 6px; }
+.app .art, .app::before { aspect-ratio: 16/9; border-radius: var(--radius-well); transition: transform var(--dur-short) var(--ease-out), opacity var(--dur-short) var(--ease-out); }
+.app .art { position: relative; display: block; overflow: hidden; isolation: isolate; background: var(--color-paper-3); }
+.app .art::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 var(--rule-hair) var(--color-rule), inset 0 1px 0 var(--color-sheen); pointer-events: none; }
+/* the lift: a shadow and a light ring fade in under the tile, so only transform and opacity move */
+.app::before { content: ""; position: absolute; left: 0; right: 0; top: 0; box-shadow: 0 22px 40px -14px var(--color-shadow), 0 0 0 2px var(--color-ink-2); opacity: 0; pointer-events: none; }
+.app img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.app .bg { display: none; }
+.app.sq .bg { display: block; filter: blur(22px) saturate(1.3); transform: scale(1.7); opacity: 0.42; }
+.app.sq .fg { left: 50%; top: 50%; width: auto; height: 56%; aspect-ratio: 1; transform: translate(-50%, -50%); object-fit: contain; filter: drop-shadow(0 6px 14px var(--color-shadow)); }
+.app .mono { position: absolute; inset: 0; display: none; place-items: center; font-size: var(--text-2xl); font-weight: 650; color: var(--color-ink-2); }
+.app.noart img { display: none; } .app.noart .mono { display: grid; }
+.app .name { display: block; padding-inline: var(--space-3xs); font-size: var(--text-sm); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color var(--dur-short) var(--ease-out); }
+@media (hover: hover) {
+  .app:hover .art, .app:hover::before { transform: translateY(-4px) scale(1.03); }
+  .app:hover::before { opacity: 1; }
+  .app:hover .name { color: var(--color-ink); }
+}
+.app:active .art, .app:active::before { transform: scale(0.97); }
+.app.opening .art::after { box-shadow: inset 0 0 0 3px var(--color-focus); }
+.app.opening .name { color: var(--color-ink); }
+.app.ghost .art { animation: breathe 1.4s var(--ease-out) infinite alternate; }
+.app.ghost .name { width: 60%; height: 0.9em; margin-top: var(--space-2xs); border-radius: var(--radius-pill); background: var(--color-paper-2); }
+@keyframes breathe { from { opacity: 0.45; } to { opacity: 0.9; } }
+#appsEmpty { padding: var(--space-lg) 0; }
+.apps-note { margin-top: var(--space-xl); }
+@media (max-width: 40rem) {
+  .find { flex: 1 1 100%; }
+  .sources button, .sources .ghost { min-height: 48px; }
+  .apps { gap: var(--space-md) var(--space-sm); }
+}
+
+/* files */
+.crumbs { display: flex; flex-wrap: wrap; gap: var(--space-2xs); align-items: center; margin-bottom: var(--space-md); color: var(--color-muted); }
+.crumbs button { min-height: 32px; padding: 0 var(--space-xs); border-radius: var(--radius-pill); color: var(--color-ink-2); text-decoration: underline; text-decoration-color: var(--color-rule); text-underline-offset: 0.2em; }
+@media (hover: hover) { .crumbs button:hover { color: var(--color-ink); } }
+.crumbs button:last-child { color: var(--color-ink); text-decoration: none; font-weight: 500; }
+.tools { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-bottom: var(--space-md); }
+.tools label:focus-within { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.progress { height: 3px; background: var(--color-paper-3); border-radius: var(--radius-pill); overflow: hidden; margin-bottom: var(--space-sm); display: none; }
+.progress div { height: 100%; width: 0; background: var(--color-accent); }
+.file { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: var(--space-sm); align-items: center; padding: var(--space-sm) 0; border-bottom: var(--rule-hair) solid var(--color-rule); }
+.file .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+@media (hover: hover) { .file .name:hover { text-decoration: underline; text-underline-offset: 0.2em; } }
+.file .meta { color: var(--color-muted); font-size: var(--text-xs); font-variant-numeric: tabular-nums; }
+.file svg { fill: var(--color-muted); } .file .dir svg { fill: var(--color-ink-2); }
+.file .more { position: relative; width: var(--control); height: var(--control); border-radius: var(--radius-pill); color: var(--color-muted); font-size: var(--text-lg); line-height: 1; transition: background-color var(--dur-short) var(--ease-out); }
+@media (hover: hover) { .file .more:hover { background: var(--color-paper-2); color: var(--color-ink); } }
+#files > .hint { padding: var(--space-lg) 0; }
+#ftpHint { margin-top: var(--space-md); }
+.drop.over { outline: 2px dashed var(--color-focus); outline-offset: 8px; border-radius: var(--radius-well); }
+
+/* settings */
+.set { max-width: 34rem; display: grid; gap: var(--space-md); }
+.set + .set { margin-top: var(--space-2xl); }
+.set h2 { font-size: var(--text-2xl); }
+.set .row { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
+.set .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr)); gap: var(--space-md); }
+.owner { display: flex; justify-content: space-between; align-items: center; gap: var(--space-sm); padding: var(--space-sm) 0; border-bottom: var(--rule-hair) solid var(--color-rule); }
+.owner button { color: var(--color-error); }
+
+/* settings: themes, updates, support */
+body:not(.is-owner) .owner-only { display: none; }
+body.can-claim .owner-only.claim { display: grid; } body.can-claim #opwClear { display: none; }
+.themes { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5rem), 1fr)); gap: var(--space-xs); }
+.themes button { display: flex; align-items: center; gap: var(--space-sm); min-height: 52px; padding: 0 var(--space-md); border-radius: var(--radius-well); background: var(--color-paper-2); box-shadow: inset 0 0 0 var(--rule-hair) var(--color-rule); font-size: var(--text-sm); font-weight: 500; text-align: left; transition: background-color var(--dur-short) var(--ease-out), transform var(--dur-micro) var(--ease-out); }
+@media (hover: hover) { .themes button:hover { background: var(--color-paper-3); } }
+.themes button[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--color-ink); }
+.themes .sw { width: 20px; height: 20px; flex: none; border-radius: 50%; box-shadow: inset 0 0 0 var(--rule-hair) var(--color-rule); background: var(--color-paper-3); }
+.sw.ember { background: var(--swatch-ember); } .sw.ocean { background: var(--swatch-ocean); } .sw.forest { background: var(--swatch-forest); } .sw.dark { background: var(--swatch-dark); } .sw.light { background: var(--swatch-light); }
+#updText.failed { color: var(--color-error); }
+dialog { width: min(100% - 2 * var(--space-md), 24rem); padding: var(--space-xl) var(--space-lg); border: 0; border-radius: var(--radius-card); background: var(--color-paper-2); color: var(--color-ink); box-shadow: inset 0 0 0 var(--rule-hair) var(--color-rule), 0 30px 80px -20px var(--color-shadow); text-align: center; }
+dialog::backdrop { background: var(--color-scrim); }
+dialog h2 { font-size: var(--text-2xl); }
+dialog p { margin-top: var(--space-xs); }
+dialog img { display: block; width: min(100%, 256px); height: auto; margin: var(--space-lg) auto; padding: var(--space-xs); border-radius: var(--radius-well); background: var(--color-qr); image-rendering: pixelated; }
+dialog .row { display: grid; gap: var(--space-xs); }
+dialog .primary { text-decoration: none; }
+
+/* connect, waiting, busy */
+.gate { min-height: 100dvh; display: grid; place-items: center; padding: var(--space-xl) 0; }
+.gate .box { width: 100%; max-width: 24rem; display: grid; gap: var(--space-md); }
+.gate h2 { font-size: var(--text-display); }
+.gate p { color: var(--color-ink-2); }
+.gate .primary { width: 100%; }
+.gate details { margin-top: var(--space-md); padding-top: var(--space-md); border-top: var(--rule-hair) solid var(--color-rule); }
+.gate summary { cursor: pointer; color: var(--color-ink-2); font-size: var(--text-sm); }
+.gate details[open] summary { margin-bottom: var(--space-md); }
+.gate details .field { margin-bottom: var(--space-sm); }
+.gate details button { width: 100%; }
+.code { font-family: var(--font-display); font-size: var(--text-code); font-weight: 650; line-height: 1; letter-spacing: 0.02em; font-variant-numeric: lining-nums tabular-nums; margin: var(--space-xs) 0; white-space: nowrap; }
+
+/* the pop-out remote */
+body.mini { padding: var(--space-xs); }
+body.mini header, body.mini .tabs, body.mini .panel, body.mini .screen { display: none !important; }
+body.mini #app { display: block; }
+body.mini main { display: block; }
+body.mini .pad { width: 196px; }
+
+/* phones: thumb-sized keys, and the pop-out fills the whole screen */
+@media (max-width: 40rem) {
+  .remote { padding: var(--space-md); }
+  .rrow { gap: var(--space-xs); margin-bottom: var(--space-xs); }
+  .rk { height: clamp(52px, 7.5dvh, 64px); }
+  .remote svg { width: 24px; height: 24px; }
+  .pad { width: min(74vw, 300px); }
+  .pad svg { width: 30px; height: 30px; }
+  .tabs { display: flex; }
+  .tabs button { flex: 1; }
+  body.mini { padding: max(var(--space-xs), env(safe-area-inset-top)) var(--space-xs) max(var(--space-lg), env(safe-area-inset-bottom)); }
+  body.mini .remote { min-height: calc(100dvh - 40px); display: flex; flex-direction: column; justify-content: space-evenly; }
+  body.mini .rrow, body.mini .pad { margin-bottom: 0; }
+  body.mini .pad { width: min(80vw, 38dvh, 340px); margin: 0 auto; }
+  body.mini .rk { height: clamp(52px, 8.5dvh, 76px); }
+}
+
+#toast { position: fixed; left: 50%; bottom: max(var(--space-lg), env(safe-area-inset-bottom)); transform: translateX(-50%); max-width: min(90%, 28rem); padding: var(--space-sm) var(--space-lg); border-radius: var(--radius-pill); background: var(--color-paper-3); box-shadow: inset 0 0 0 var(--rule-hair) var(--color-rule); color: var(--color-ink); font-size: var(--text-sm); opacity: 0; transition: opacity var(--dur-short) var(--ease-out); pointer-events: none; z-index: var(--z-toast); }
+#toast.on { opacity: 1; }
+.watermark { margin: var(--space-2xl) auto 0; max-width: var(--app-max); text-align: center; font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; color: var(--color-muted); }
+body.mini .watermark { display: none; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; } button:active, .tools label:active, .pad button:active { transform: none; } .app:hover .art, .app:hover::before, .app:active .art, .app:active::before { transform: none; } .app.ghost .art, .sources .ghost { animation: none; opacity: 0.6; } }
+</style>
+</head>
+<body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <symbol id="i-logo" viewBox="0 0 24 24"><path d="M21 3H3C1.9 3 1 3.9 1 5v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H3V5h18v12zM8 9l4-3 4 3h-3v4h-2V9H8z"/></symbol>
+  <symbol id="i-power" viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17-1.42 1.42A6.92 6.92 0 0 1 19 12a7 7 0 1 1-11.42-5.42L6.17 5.17A8.93 8.93 0 0 0 3 12a9 9 0 0 0 18 0c0-2.74-1.23-5.18-3.17-6.83z"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M7.41 15.41 12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M15.41 16.59 10.83 12l4.58-4.59L14 6l-6 6 6 6z"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"/></symbol>
+  <symbol id="i-volup" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></symbol>
+  <symbol id="i-voldown" viewBox="0 0 24 24"><path d="M18.5 12A4.5 4.5 0 0 0 16 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM5 9v6h4l5 5V4L9 9H5z"/></symbol>
+  <symbol id="i-mute" viewBox="0 0 24 24"><path d="M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51A8.8 8.8 0 0 0 21 12a9 9 0 0 0-7-8.77v2.06A7 7 0 0 1 19 12zM4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a8.99 8.99 0 0 0 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4 9.91 6.09 12 8.18V4z"/></symbol>
+  <symbol id="i-input" viewBox="0 0 24 24"><path d="M21 3.01H3c-1.1 0-2 .9-2 2V9h2V4.99h18v14.03H3V15H1v4.01c0 1.1.9 1.98 2 1.98h18c1.1 0 2-.88 2-1.98v-14a2 2 0 0 0-2-2zM11 16l4-4-4-4v3H1v2h10v3z"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><path d="M19.14 12.94a7.07 7.07 0 0 0 0-1.88l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.03 7.03 0 0 0-1.62-.94l-.36-2.54A.48.48 0 0 0 13.93 2h-3.84a.47.47 0 0 0-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.48.48 0 0 0-.59.22L2.74 8.47a.47.47 0 0 0 .12.61l2.03 1.58a7.4 7.4 0 0 0 0 1.88l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.47.41h3.84c.24 0 .44-.17.47-.41l.36-2.54a7.2 7.2 0 0 0 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.49.49 0 0 0-.12-.61l-2.01-1.58zM12 15.6a3.6 3.6 0 1 1 0-7.2 3.6 3.6 0 0 1 0 7.2z"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 5v14l6-7zm7 0h3v14h-3z"/></symbol>
+  <symbol id="i-rew" viewBox="0 0 24 24"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6 8.5 6V6l-8.5 6z"/></symbol>
+  <symbol id="i-ff" viewBox="0 0 24 24"><path d="m4 18 8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></symbol>
+  <symbol id="i-popout" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></symbol>
+  <symbol id="i-full" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></symbol>
+  <symbol id="i-exitfull" viewBox="0 0 24 24"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></symbol>
+  <symbol id="i-screen" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></symbol>
+  <symbol id="i-kbd" viewBox="0 0 24 24"><path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm9 7H8v-2h8v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></symbol>
+</svg>
+
+<!-- connect / waiting / busy -->
+<section class="gate hidden" id="gate">
+  <div class="box" id="gConnect">
+    <h2>Tasin Shares</h2>
+    <p>Control this TV from here. A code shows on the TV; allow it there.</p>
+    <div class="field">
+      <label for="devName">This device’s name</label>
+      <input id="devName" maxlength="40" autocomplete="off">
+    </div>
+    <button class="primary" id="connectBtn" type="button">Connect</button>
+    <details class="ownerLogin">
+      <summary>I’m the owner</summary>
+      <div class="field">
+        <label for="ownerPw">Owner password</label>
+        <input id="ownerPw" type="password" autocomplete="current-password">
+      </div>
+      <button id="ownerBtn" type="button">Connect as owner</button>
+    </details>
+  </div>
+  <div class="box hidden" id="gWait">
+    <h2>Allow on the TV</h2>
+    <p>The TV shows this code. Check it matches, then choose Allow there.</p>
+    <div class="code" id="code" aria-live="polite"></div>
+    <p class="hint" id="waitHint" role="status">Waiting…</p>
+    <button id="cancelBtn" type="button">Cancel</button>
+  </div>
+  <div class="box hidden" id="gBusy">
+    <h2>TV in use</h2>
+    <p id="busyText"></p>
+    <button class="primary hidden" id="takeoverBtn" type="button">Take over (owner)</button>
+    <button id="retryBtn" type="button">Try again</button>
+  </div>
+</section>
+
+<div id="app" class="hidden">
+  <header>
+    <h1>Tasin Shares</h1>
+    <div id="status" role="status"><span id="dot" aria-hidden="true"></span><span id="statusText">Connecting…</span></div>
+    <div class="sp"></div>
+    <button class="icon" id="popoutBtn" type="button" title="Pop out the remote" aria-label="Pop out the remote"><svg aria-hidden="true"><use href="#i-popout"/></svg></button>
+  </header>
+
+  <main id="main">
+    <section class="screen hidden" id="screen" aria-label="TV screen">
+      <div class="stage" id="stage" tabindex="0">
+        <video id="video" muted playsinline autoplay disablepictureinpicture></video>
+        <div class="msg" id="stageMsg">Starting the screen…</div>
+        <div class="fsbar"><button id="fsExit" type="button" title="Exit fullscreen" aria-label="Exit fullscreen"><svg aria-hidden="true"><use href="#i-exitfull"/></svg></button></div>
+      </div>
+      <div class="bar">
+        <button id="kbdBtn" type="button" title="Send this device's keyboard to the TV"><svg aria-hidden="true"><use href="#i-kbd"/></svg>Keyboard</button>
+        <select id="audioSel" title="Where the TV's sound plays" aria-label="Where the TV's sound plays">
+          <option value="tv">Sound: TV only</option>
+          <option value="device">Sound: this device only</option>
+          <option value="both">Sound: both</option>
+        </select>
+        <span class="hint num" id="resHint"></span>
+        <span class="sp"></span>
+        <button id="fsBtn" type="button" title="Fullscreen" aria-label="Fullscreen"><svg aria-hidden="true"><use href="#i-full"/></svg></button>
+      </div>
+    </section>
+
+    <section class="remote" id="remote" aria-label="Remote">
+      <div class="rrow">
+        <button class="rk power" data-key="26" type="button" title="Power" aria-label="Power"><svg aria-hidden="true"><use href="#i-power"/></svg></button>
+        <button class="rk" data-key="178" type="button" title="Input" aria-label="Input"><svg aria-hidden="true"><use href="#i-input"/></svg></button>
+        <button class="rk" id="screenBtn" type="button" title="Show the TV screen" aria-label="Show the TV screen"><svg aria-hidden="true"><use href="#i-screen"/></svg></button>
+      </div>
+      <div class="pad">
+        <button class="u" data-key="19" data-repeat type="button" aria-label="Up"><svg aria-hidden="true"><use href="#i-up"/></svg></button>
+        <button class="l" data-key="21" data-repeat type="button" aria-label="Left"><svg aria-hidden="true"><use href="#i-left"/></svg></button>
+        <button class="ok" data-key="23" type="button">OK</button>
+        <button class="r" data-key="22" data-repeat type="button" aria-label="Right"><svg aria-hidden="true"><use href="#i-right"/></svg></button>
+        <button class="d" data-key="20" data-repeat type="button" aria-label="Down"><svg aria-hidden="true"><use href="#i-down"/></svg></button>
+      </div>
+      <div class="rrow">
+        <button class="rk" data-key="4" type="button" title="Back" aria-label="Back"><svg aria-hidden="true"><use href="#i-back"/></svg></button>
+        <button class="rk" data-key="3" type="button" title="Home" aria-label="Home"><svg aria-hidden="true"><use href="#i-home"/></svg></button>
+        <button class="rk" data-key="176" type="button" title="Settings" aria-label="Settings"><svg aria-hidden="true"><use href="#i-settings"/></svg></button>
+      </div>
+      <div class="rrow">
+        <button class="rk" data-key="25" data-repeat type="button" title="Volume down" aria-label="Volume down"><svg aria-hidden="true"><use href="#i-voldown"/></svg></button>
+        <button class="rk" data-key="164" type="button" title="Mute" aria-label="Mute"><svg aria-hidden="true"><use href="#i-mute"/></svg></button>
+        <button class="rk" data-key="24" data-repeat type="button" title="Volume up" aria-label="Volume up"><svg aria-hidden="true"><use href="#i-volup"/></svg></button>
+      </div>
+      <div class="rrow r4">
+        <button class="rk" data-key="89" data-repeat type="button" title="Rewind" aria-label="Rewind"><svg aria-hidden="true"><use href="#i-rew"/></svg></button>
+        <button class="rk" data-key="85" type="button" title="Play or pause" aria-label="Play or pause"><svg aria-hidden="true"><use href="#i-play"/></svg></button>
+        <button class="rk" data-key="90" data-repeat type="button" title="Fast forward" aria-label="Fast forward"><svg aria-hidden="true"><use href="#i-ff"/></svg></button>
+        <button class="rk" data-key="84" type="button" title="Search" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></button>
+      </div>
+      <form class="type" id="typeForm">
+        <input id="typeText" placeholder="Type on the TV" aria-label="Text to type on the TV" autocomplete="off" autocapitalize="off">
+        <button type="submit" class="btn">Send</button>
+      </form>
+    </section>
+  </main>
+
+  <div class="panel">
+    <nav class="tabs" aria-label="Sections">
+      <button data-tab="apps" class="on" type="button">Apps</button>
+      <button data-tab="files" type="button">Files</button>
+      <button data-tab="settings" id="settingsTab" type="button">Settings</button>
+    </nav>
+
+    <section class="view on" id="v-apps" aria-label="Apps">
+      <div class="shelf-head"><h2>Sources</h2></div>
+      <div class="sources" id="inputs" aria-busy="true"><span class="ghost"></span><span class="ghost"></span><span class="ghost"></span><span class="ghost"></span></div>
+      <div class="shelf-head">
+        <h2>Installed apps<span class="count num" id="appCount"></span></h2>
+        <div class="find"><svg aria-hidden="true"><use href="#i-search"/></svg><input id="appSearch" type="search" placeholder="Find an app" aria-label="Find an app" autocomplete="off" enterkeyhint="go"></div>
+      </div>
+      <div class="apps" id="apps" aria-busy="true"><div class="app ghost"><span class="art"></span><span class="name"></span></div><div class="app ghost"><span class="art"></span><span class="name"></span></div><div class="app ghost"><span class="art"></span><span class="name"></span></div><div class="app ghost"><span class="art"></span><span class="name"></span></div><div class="app ghost"><span class="art"></span><span class="name"></span></div><div class="app ghost"><span class="art"></span><span class="name"></span></div><div class="app ghost"><span class="art"></span><span class="name"></span></div><div class="app ghost"><span class="art"></span><span class="name"></span></div></div>
+      <p class="hint" id="appsEmpty" role="status" hidden></p>
+      <p class="hint apps-note">To force stop an app, right-click it or press and hold.</p>
+    </section>
+
+    <section class="view drop" id="v-files" aria-label="Files">
+      <div class="crumbs" id="crumbs"></div>
+      <div class="tools">
+        <label>Upload<input type="file" id="fileInput" multiple hidden></label>
+        <button id="mkdirBtn" type="button">New folder</button>
+        <button id="refreshBtn" type="button">Refresh</button>
+      </div>
+      <div class="progress" id="progress"><div></div></div>
+      <div id="files"></div>
+      <p class="hint" id="ftpHint"></p>
+    </section>
+
+    <section class="view" id="v-settings" aria-label="Settings">
+      <div class="set">
+        <h2>Theme</h2>
+        <p class="hint">Changes this browser only. The TV picks its own theme in its Settings.</p>
+        <div class="themes" id="themes" aria-label="Theme">
+          <button type="button" data-theme="" aria-pressed="true"><span class="sw" aria-hidden="true"></span>Same as the TV</button>
+          <button type="button" data-theme="ember" aria-pressed="false"><span class="sw ember" aria-hidden="true"></span>Ember</button>
+          <button type="button" data-theme="ocean" aria-pressed="false"><span class="sw ocean" aria-hidden="true"></span>Ocean</button>
+          <button type="button" data-theme="forest" aria-pressed="false"><span class="sw forest" aria-hidden="true"></span>Forest</button>
+          <button type="button" data-theme="dark" aria-pressed="false"><span class="sw dark" aria-hidden="true"></span>Dark</button>
+          <button type="button" data-theme="light" aria-pressed="false"><span class="sw light" aria-hidden="true"></span>Light</button>
+        </div>
+      </div>
+      <div class="set owner-only">
+        <h2>Updates</h2>
+        <p id="updText" role="status">Checking the version…</p>
+        <div class="row"><button class="btn" id="updBtn" type="button">Check for updates</button></div>
+        <p class="hint">The TV downloads the newest release from GitHub and installs it itself. This page reconnects when it is done.</p>
+      </div>
+      <div class="set owner-only">
+        <h2>Sharing</h2>
+        <div class="grid">
+          <div class="field"><label for="sWeb">Web port</label><input id="sWeb" inputmode="numeric" autocomplete="off"></div>
+          <div class="field"><label for="sFtp">FTP port</label><input id="sFtp" inputmode="numeric" autocomplete="off"></div>
+          <div class="field"><label for="sPw">FTP password</label><input id="sPw" autocomplete="new-password"></div>
+        </div>
+        <p class="hint">The FTP login is user <b>tv</b> with this password. The FTP server also uses the nine ports after its own for data.</p>
+        <div class="row"><button class="primary" id="saveBtn" type="button">Save</button></div>
+      </div>
+      <div class="set owner-only claim">
+        <h2>Owner password</h2>
+        <p class="hint" id="opwState">Typed on the connect screen, it makes that browser an owner without the TV. It is never shown anywhere; only you know it.</p>
+        <div class="field"><label for="sOpw">New owner password</label><input id="sOpw" type="password" autocomplete="new-password" placeholder="8 to 64 characters"></div>
+        <div class="row"><button class="btn" id="opwBtn" type="button">Set owner password</button><button id="opwClear" type="button">Remove</button></div>
+      </div>
+      <div class="set owner-only">
+        <h2>Owner devices</h2>
+        <p class="hint">These reconnect without a code and can take over control.</p>
+        <div id="owners"></div>
+      </div>
+      <div class="set">
+        <h2>Support</h2>
+        <p class="hint">If Tasin Shares helps you, you can buy me a coffee.</p>
+        <div class="row"><button class="btn" id="coffeeBtn" type="button">Buy me a coffee</button></div>
+      </div>
+    </section>
+    <dialog id="coffee" aria-labelledby="coffeeTitle">
+      <h2 id="coffeeTitle">Buy me a coffee</h2>
+      <p class="hint">Scan the code with your phone’s camera, or open the page.</p>
+      <img src="/coffee.png" width="256" height="256" alt="QR code for the Buy me a coffee page" loading="lazy">
+      <div class="row">
+        <a class="primary" href="https://www.supportkori.com/tasinpy" target="_blank" rel="noopener">Open supportkori.com/tasinpy</a>
+        <button class="btn" id="coffeeClose" type="button">Close</button>
+      </div>
+    </dialog>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<div class="watermark" aria-hidden="true">Tasin Shares</div>
+
+
+<script src="/jmuxer.min.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const MINI = new URLSearchParams(location.search).has('mini');
+if (MINI) document.body.classList.add('mini');
+let toastTimer;
+function toast(msg) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('on');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('on'), 3000);
+}
+function show(el, on = true) { el.classList.toggle('hidden', !on); }
+
+async function api(path, opts = {}) {
+  const r = await fetch('/api/' + path, { credentials: 'same-origin', ...opts });
+  if (r.status === 401) { gate('connect'); throw new Error('Not connected'); }
+  if (!r.ok) throw new Error(await r.text());
+  return r;
+}
+const form = p => ({ method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(p).toString() });
+const post = (path, p = {}) => api(path, form(p));
+
+// ---------- connect, approval, busy
+
+let me = null;
+function gate(which, text) {
+  show($('#gate'), !!which); show($('#app'), !which);
+  show($('#gConnect'), which === 'connect'); show($('#gWait'), which === 'wait'); show($('#gBusy'), which === 'busy');
+  if (which === 'busy') $('#busyText').textContent = text || '';
+}
+function guessName() {
+  const ua = navigator.userAgent;
+  if (/iPhone/.test(ua)) return 'iPhone'; if (/iPad/.test(ua)) return 'iPad';
+  if (/Android/.test(ua)) return /Mobile/.test(ua) ? 'Android phone' : 'Android tablet';
+  if (/Windows/.test(ua)) return 'Windows PC'; if (/Mac/.test(ua)) return 'Mac';
+  return 'Browser';
+}
+try { $('#devName').value = localStorage.getItem('ts.name') || guessName(); } catch (e) { $('#devName').value = guessName(); }
+
+let pollTimer, requestId;
+$('#connectBtn').onclick = async () => {
+  const name = $('#devName').value.trim() || guessName();
+  try { localStorage.setItem('ts.name', name); } catch (e) {}
+  try {
+    const r = await fetch('/api/request', form({ name }));
+    if (!r.ok) { toast(await r.text()); return; }
+    const d = await r.json();
+    requestId = d.id;
+    $('#code').textContent = d.code.slice(0, 3) + ' ' + d.code.slice(3);
+    $('#waitHint').textContent = 'Waiting for the TV…';
+    gate('wait');
+    clearInterval(pollTimer);
+    pollTimer = setInterval(poll, 1200);
+  } catch (e) { toast('The TV did not answer.'); }
+};
+async function poll() {
+  try {
+    const r = await fetch('/api/request?id=' + requestId);
+    const d = r.ok ? await r.json() : { state: 'expired' };
+    if (d.state === 'pending') return;
+    clearInterval(pollTimer);
+    if (d.state === 'approved') { toast('Allowed on the TV'); start(); }
+    else { gate('connect'); toast(d.state === 'denied' ? 'Denied on the TV.' : 'The code expired. Try again.'); }
+  } catch (e) {}
+}
+$('#ownerBtn').onclick = async () => {
+  const name = $('#devName').value.trim() || guessName();
+  try { localStorage.setItem('ts.name', name); } catch (e) {}
+  try {
+    const r = await fetch('/api/owner-login', form({ name, password: $('#ownerPw').value }));
+    if (!r.ok) { toast(await r.text()); return; }
+    $('#ownerPw').value = '';
+    toast('Connected as owner'); start();
+  } catch (e) { toast('The TV did not answer.'); }
+};
+$('#ownerPw').onkeydown = e => { if (e.key === 'Enter') $('#ownerBtn').click(); };
+$('#cancelBtn').onclick = () => { clearInterval(pollTimer); gate('connect'); };
+$('#retryBtn').onclick = () => start();
+$('#takeoverBtn').onclick = () => start(true);
+
+async function start(takeOver) {
+  let d;
+  try { d = await (await fetch('/api/me')).json(); } catch (e) { toast('The TV did not answer.'); return; }
+  if (!d.connected) { gate(MINI ? 'busy' : 'connect', 'Connect in the main Tasin Shares window first.'); return; }
+  me = d;
+  document.body.classList.toggle('is-owner', !!d.owner);
+  // A fresh install has no owner yet: the first device the TV allowed may set the owner password.
+  const claim = !d.owner && d.ownerPasswordSet === false;
+  document.body.classList.toggle('can-claim', claim);
+  if (claim) $('#opwState').firstChild.textContent = 'There is no owner yet. Set an owner password to make this device the owner; other devices type it under I’m the owner. It is never shown anywhere.';
+  if (d.theme) { tvTheme = d.theme; applyTheme(); }
+  gate(null);
+  setStatus(d.adb === 'CONNECTED' ? 'ok' : 'warn', d.adb === 'CONNECTED' ? (d.owner ? d.name + ' (owner)' : d.name) : (d.adbError || 'Connecting…'));
+  if (MINI) return; // the pop-out uses the HTTP API only and never takes the stream
+  openSocket(takeOver);
+  if (!appsLoaded) loadApps();
+}
+
+function setStatus(kind, text) {
+  $('#dot').style.background = kind === 'ok' ? 'var(--color-ok)' : kind === 'bad' ? 'var(--color-error)' : 'var(--color-warn)';
+  $('#statusText').textContent = text;
+}
+
+// ---------- the control socket: video, audio, input
+
+let ws, wsPing, controlling = false, wantVideo = false, audioMode = 'tv', vsize = null;
+function openSocket(takeOver) {
+  if (ws) { try { ws.close(); } catch (e) {} }
+  const s = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws' + (takeOver ? '?takeover=1' : ''));
+  ws = s;
+  s.binaryType = 'arraybuffer';
+  s.onopen = () => { clearInterval(wsPing); wsPing = setInterval(() => send({ t: 'ping' }), 10000); };
+  s.onmessage = e => typeof e.data === 'string' ? onEvent(JSON.parse(e.data)) : onPacket(e.data);
+  s.onclose = () => {
+    if (ws !== s) return;
+    clearInterval(wsPing);
+    if (controlling) { controlling = false; setStatus('bad', 'Disconnected. Reconnecting…'); setTimeout(() => start(), 2000); }
+  };
+}
+function send(o) { if (ws && ws.readyState === 1) ws.send(JSON.stringify(o)); }
+
+function onEvent(m) {
+  switch (m.t) {
+    case 'hello':
+      controlling = true;
+      setStatus('ok', m.name + (m.owner ? ' (owner)' : ''));
+      $('#audioSel').querySelector('[value=both]').disabled = !m.bothAudio;
+      if (!m.bothAudio) $('#audioSel').querySelector('[value=both]').textContent = 'Sound: both (needs Android 13)';
+      if (wantVideo || audioMode !== 'tv') sendConfig();
+      break;
+    case 'busy':
+      controlling = false; ws.close();
+      show($('#takeoverBtn'), m.canTakeOver);
+      gate('busy', m.by + ' is controlling the TV.' + (m.canTakeOver ? ' As an owner you can take over.' : ''));
+      break;
+    case 'kicked': case 'replaced': case 'ended':
+      controlling = false;
+      show($('#takeoverBtn'), !!(me && me.owner));
+      gate('busy', m.msg || 'Disconnected.');
+      stopPlayers();
+      break;
+    case 'size':
+      vsize = { w: m.w, h: m.h };
+      $('#resHint').textContent = m.w + '×' + m.h;
+      break;
+    case 'starting':
+      if (m.video && !gotKey && $('#video').paused) stageMsg('Starting the screen…');
+      break;
+    case 'started':
+      if (!m.video) stageMsg(null);
+      break;
+    case 'stream-ended':
+      stageMsg('The stream stopped' + (m.msg ? ': ' + m.msg : '') + '. Press the screen button to start it again.');
+      stopPlayers(); wantVideo = false; syncScreenUi();
+      break;
+    case 'audio-off':
+      toast(m.msg); audioMode = 'tv'; $('#audioSel').value = 'tv'; stopAudio();
+      break;
+    case 'notice': case 'error':
+      toast(m.msg);
+      break;
+  }
+}
+
+// video: 1 byte kind, 1 byte flags (1 config, 2 key frame), 8 bytes pts (µs), then data
+let jm = null, pendingConfig = null, lastPts = null, gotKey = false;
+function onPacket(buf) {
+  const v = new DataView(buf);
+  const kind = v.getUint8(0), flags = v.getUint8(1);
+  const pts = Number(v.getBigUint64(2));
+  const data = new Uint8Array(buf, 10);
+  if (kind === 1) {
+    if (!wantVideo) return;
+    if (flags & 1) { pendingConfig = data.slice(); return; }
+    if (!gotKey) { if (!(flags & 2)) return; gotKey = true; stageMsg(null); }
+    let frame = data;
+    if (pendingConfig) { frame = new Uint8Array(pendingConfig.length + data.length); frame.set(pendingConfig); frame.set(data, pendingConfig.length); pendingConfig = null; }
+    const duration = lastPts === null ? 16 : Math.max(1, Math.min(200, (pts - lastPts) / 1000));
+    lastPts = pts;
+    ensureMuxer().feed({ video: frame, duration });
+  } else if (kind === 2) {
+    playPcm(data);
+  }
+}
+function plog(msg) { try { send({ t: 'log', msg: String(msg) }); } catch (e) {} }
+let videoErrors = [];
+function ensureMuxer() {
+  if (!jm) {
+    plog('video start: ' + navigator.userAgent + ' | MediaSource ' + !!window.MediaSource + ' ManagedMediaSource ' + !!window.ManagedMediaSource
+      + ' | avc ' + (window.MediaSource || window.ManagedMediaSource || { isTypeSupported: () => 'n/a' }).isTypeSupported('video/mp4; codecs="avc1.640028"'));
+    jm = new JMuxer({ node: 'video', mode: 'video', flushingTime: 0, fps: 60, clearBuffer: true, debug: false,
+      onError: err => {
+        plog('jmuxer error: ' + (err && (err.message || err.name || JSON.stringify(err)) || err));
+        const now = Date.now();
+        videoErrors = videoErrors.filter(t => now - t < 20000); videoErrors.push(now);
+        if (!jm) return;
+        jm.reset(); gotKey = false; pendingConfig = null;
+        if (videoErrors.length > 4) { stageMsg('This browser could not play the screen (' + (err && (err.message || err.name) || 'decoder error') + ').'); return; }
+        // Same config: the TV only sends a fresh keyframe, the session keeps running.
+        send({ t: 'config', video: true, audio: audioMode });
+      } });
+  }
+  return jm;
+}
+$('#video').addEventListener('error', () => { const e = $('#video').error; plog('video element error: ' + (e ? e.code + ' ' + e.message : '?')); });
+$('#video').addEventListener('playing', () => plog('video playing'));
+// A picture on screen means it started, whatever message arrived in between.
+['playing', 'timeupdate'].forEach(ev => $('#video').addEventListener(ev, () => {
+  if ($('#stageMsg').textContent === 'Starting the screen…') stageMsg(null);
+}));
+// keep the picture live: play a little faster to catch up. Jumping to the newest frame made the browser
+// decode from the last keyframe, which flashed a picture seconds old (often the Home screen).
+setInterval(() => {
+  const vid = $('#video');
+  if (!jm || !vid.buffered.length) return;
+  const end = vid.buffered.end(vid.buffered.length - 1), behind = end - vid.currentTime;
+  if (behind > 3) vid.currentTime = end - 0.1;           // far behind (tab was hidden): jump once
+  else vid.playbackRate = behind > 0.25 ? 1.25 : behind < 0.08 ? 1 : vid.playbackRate;
+  if (vid.paused) vid.play().catch(() => {});
+}, 250);
+
+function stopPlayers() {
+  if (jm) { try { jm.destroy(); } catch (e) {} jm = null; }
+  pendingConfig = null; lastPts = null; gotKey = false;
+  stopAudio();
+}
+function stageMsg(t) { const m = $('#stageMsg'); m.textContent = t || ''; show(m, !!t); }
+
+// audio: raw PCM s16le, 48 kHz stereo
+let actx = null, nextTime = 0;
+function startAudio() {
+  if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 48000 });
+  actx.resume(); nextTime = 0;
+}
+function stopAudio() { if (actx) { actx.close(); actx = null; } }
+function playPcm(bytes) {
+  if (!actx || audioMode === 'tv') return;
+  const n = bytes.byteLength >> 2;
+  if (!n) return;
+  const pcm = new Int16Array(bytes.buffer, bytes.byteOffset, n * 2);
+  const ab = actx.createBuffer(2, n, 48000);
+  const l = ab.getChannelData(0), r = ab.getChannelData(1);
+  for (let i = 0; i < n; i++) { l[i] = pcm[2 * i] / 32768; r[i] = pcm[2 * i + 1] / 32768; }
+  const now = actx.currentTime;
+  if (nextTime < now + 0.02 || nextTime > now + 0.35) nextTime = now + 0.06; // underrun or drift: resync
+  const src = actx.createBufferSource(); src.buffer = ab; src.connect(actx.destination); src.start(nextTime);
+  nextTime += ab.duration;
+}
+
+function sendConfig() { send({ t: 'config', video: wantVideo, audio: audioMode }); }
+function syncScreenUi() {
+  show($('#screen'), wantVideo);
+  $('#main').classList.toggle('with-screen', wantVideo);
+  $('#screenBtn').classList.toggle('on', wantVideo);
+}
+$('#screenBtn').onclick = () => {
+  if (MINI) { window.opener ? window.opener.focus() : toast('Open the screen in the main window.'); return; }
+  wantVideo = !wantVideo;
+  stopPlayers();
+  if (audioMode !== 'tv') startAudio();
+  if (wantVideo) stageMsg('Starting the screen…');
+  syncScreenUi(); sendConfig();
+};
+$('#audioSel').onchange = e => {
+  audioMode = e.target.value;
+  if (audioMode === 'tv') stopAudio(); else startAudio();
+  if (audioMode === 'device') toast('The TV speakers go quiet while the sound plays here.');
+  sendConfig();
+};
+
+// fullscreen
+function toggleFs() {
+  const st = $('#stage');
+  if (document.fullscreenElement) document.exitFullscreen();
+  else (st.requestFullscreen || st.webkitRequestFullscreen).call(st);
+}
+$('#fsBtn').onclick = toggleFs; $('#fsExit').onclick = toggleFs;
+$('#stage').addEventListener('dblclick', toggleFs);
+
+// ---------- mouse, touch and keyboard on the screen
+
+function videoPoint(e) {
+  if (!vsize) return null;
+  const r = $('#video').getBoundingClientRect();
+  const scale = Math.min(r.width / vsize.w, r.height / vsize.h);
+  const dw = vsize.w * scale, dh = vsize.h * scale;
+  const x = (e.clientX - r.left - (r.width - dw) / 2) / scale, y = (e.clientY - r.top - (r.height - dh) / 2) / scale;
+  if (x < 0 || y < 0 || x >= vsize.w || y >= vsize.h) return null;
+  return { x: Math.round(x), y: Math.round(y) };
+}
+const vid = $('#video');
+let down = false, lastMove = 0;
+vid.addEventListener('contextmenu', e => e.preventDefault());
+vid.addEventListener('pointerdown', e => {
+  e.preventDefault(); $('#stage').focus();
+  if (e.pointerType === 'mouse' && e.button === 2) { tapKey(4); return; }   // right click: Back
+  if (e.pointerType === 'mouse' && e.button === 1) { tapKey(3); return; }   // middle click: Home
+  const p = videoPoint(e); if (!p) return;
+  down = true; vid.setPointerCapture(e.pointerId);
+  send({ t: 'touch', a: 0, id: e.pointerType === 'mouse' ? -1 : -2, x: p.x, y: p.y, ab: 1, b: 1 });
+});
+vid.addEventListener('pointermove', e => {
+  const now = performance.now(); if (now - lastMove < 16) return; lastMove = now;
+  const p = videoPoint(e); if (!p) return;
+  if (down) send({ t: 'touch', a: 2, id: e.pointerType === 'mouse' ? -1 : -2, x: p.x, y: p.y, b: 1 });
+  else if (e.pointerType === 'mouse') send({ t: 'touch', a: 7, id: -1, x: p.x, y: p.y, b: 0 });
+});
+const up = e => {
+  if (!down) return; down = false;
+  const p = videoPoint(e) || { x: 0, y: 0 };
+  send({ t: 'touch', a: 1, id: e.pointerType === 'mouse' ? -1 : -2, x: p.x, y: p.y, ab: 1, b: 0 });
+};
+vid.addEventListener('pointerup', up); vid.addEventListener('pointercancel', up);
+vid.addEventListener('wheel', e => {
+  e.preventDefault();
+  const p = videoPoint(e); if (!p) return;
+  const k = e.deltaMode === 1 ? 1 : 1 / 100;
+  send({ t: 'scroll', x: p.x, y: p.y, h: Math.max(-16, Math.min(16, -e.deltaX * k)), v: Math.max(-16, Math.min(16, -e.deltaY * k)) });
+}, { passive: false });
+
+// keyboard: printable characters go as text, everything else as Android keycodes with modifiers
+const KC = { Enter: 66, NumpadEnter: 66, Backspace: 67, Tab: 61, Space: 62, Escape: 111, Delete: 112, Insert: 124,
+  ArrowUp: 19, ArrowDown: 20, ArrowLeft: 21, ArrowRight: 22, Home: 122, End: 123, PageUp: 92, PageDown: 93,
+  Minus: 69, Equal: 70, BracketLeft: 71, BracketRight: 72, Backslash: 73, Semicolon: 74, Quote: 75, Slash: 76,
+  Comma: 55, Period: 56, Backquote: 68, ContextMenu: 82, MediaPlayPause: 85, MediaTrackNext: 87, MediaTrackPrevious: 88,
+  AudioVolumeUp: 24, AudioVolumeDown: 25, AudioVolumeMute: 164 };
+for (let i = 0; i < 26; i++) KC['Key' + String.fromCharCode(65 + i)] = 29 + i;
+for (let i = 0; i < 10; i++) { KC['Digit' + i] = 7 + i; KC['Numpad' + i] = 144 + i; }
+for (let i = 1; i <= 12; i++) KC['F' + i] = 130 + i;
+let kbdOn = false;
+$('#kbdBtn').onclick = () => { kbdOn = !kbdOn; $('#kbdBtn').classList.toggle('on', kbdOn); $('#stage').classList.toggle('capturing', kbdOn); if (kbdOn) { $('#stage').focus(); toast('Keys go to the TV while the screen has focus. Click outside it to stop.'); } };
+function meta(e) { return (e.shiftKey ? 0x41 : 0) | (e.altKey ? 0x12 : 0) | (e.ctrlKey ? 0x3000 : 0) | (e.metaKey ? 0x30000 : 0); }
+$('#stage').addEventListener('keydown', e => {
+  if (!kbdOn) return;
+  if (e.key === 'F11') return;
+  e.preventDefault();
+  if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) { send({ t: 'text', s: e.key }); return; }
+  const code = KC[e.code]; if (code) send({ t: 'key', code, a: 0, m: meta(e), r: e.repeat ? 1 : 0 });
+});
+$('#stage').addEventListener('keyup', e => {
+  if (!kbdOn) return;
+  e.preventDefault();
+  if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) return;
+  const code = KC[e.code]; if (code) send({ t: 'key', code, a: 1, m: meta(e) });
+});
+
+// ---------- compact remote
+
+function tapKey(code, long) {
+  if (!MINI && controlling && !long) { send({ t: 'key', code }); return; }
+  post('key', { code, long: long ? 1 : 0 }).catch(e => toast(e.message));
+}
+let inflight = 0;
+function key(code, long) {
+  if (inflight > 4) return;
+  inflight++; Promise.resolve(tapKey(code, long)).finally(() => inflight--);
+  if (navigator.vibrate) navigator.vibrate(8);
+}
+$$('[data-key]').forEach(b => {
+  const code = +b.dataset.key;
+  let hold, rep, down = false, repeat = 0;
+  // While this page controls the TV, a press is a real key down and up, with the remote's own repeats while held:
+  // holding OK, Home or Back is a long press on the TV, and a held arrow or volume keeps going.
+  const live = () => !MINI && controlling;
+  const stop = () => {
+    clearTimeout(hold); clearInterval(rep);
+    if (down) { down = false; send({ t: 'key', code, a: 1, r: 0 }); }
+  };
+  b.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    try { b.setPointerCapture(e.pointerId); } catch (er) {}
+    if (navigator.vibrate) navigator.vibrate(8);
+    if (live()) {
+      down = true; repeat = 0;
+      send({ t: 'key', code, a: 0, r: 0 });
+      hold = setTimeout(() => { rep = setInterval(() => { if (down) send({ t: 'key', code, a: 0, r: ++repeat }); }, 50); }, 400);
+      return;
+    }
+    key(code);
+    if (b.hasAttribute('data-repeat')) hold = setTimeout(() => { rep = setInterval(() => key(code), 160); }, 420);
+    else hold = setTimeout(() => key(code, true), 700);
+  });
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev => b.addEventListener(ev, stop));
+  b.addEventListener('contextmenu', e => e.preventDefault());
+  b.addEventListener('click', e => e.preventDefault());
+});
+$('#typeForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const v = $('#typeText').value;
+  if (!v) { key(66); return; }
+  if (!MINI && controlling) send({ t: 'text', s: v });
+  else await post('text', { value: v }).catch(err => toast(err.message));
+  $('#typeText').value = '';
+});
+// arrow keys etc. drive the remote when nothing else has focus and the keyboard passthrough is off
+const RK = { ArrowUp: 19, ArrowDown: 20, ArrowLeft: 21, ArrowRight: 22, Enter: 23, Backspace: 4, Escape: 4 };
+document.addEventListener('keydown', e => {
+  if (kbdOn && document.activeElement === $('#stage')) return;
+  if (['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName) || $('#app').classList.contains('hidden')) return;
+  const code = RK[e.key]; if (code) { e.preventDefault(); key(code); }
+});
+
+$('#popoutBtn').onclick = () => {
+  const w = window.open(location.pathname + '?mini=1', 'tasinremote', 'popup,width=252,height=470');
+  if (!w) toast('The browser blocked the pop-out window.');
+};
+
+// ---------- apps, inputs
+
+let appsLoaded = false;
+function sourceButton(label, icon, onclick) {
+  const b = document.createElement('button'); b.type = 'button';
+  b.innerHTML = '<svg aria-hidden="true"><use href="#' + icon + '"/></svg>';
+  const s = document.createElement('span'); s.textContent = label;
+  b.append(s); b.onclick = onclick; return b;
+}
+async function loadApps() {
+  try {
+    const [apps, inputs] = await Promise.all([api('apps').then(r => r.json()), api('inputs').then(r => r.json())]);
+    const inp = $('#inputs'); inp.innerHTML = ''; inp.removeAttribute('aria-busy');
+    inputs.forEach(i => inp.appendChild(sourceButton(i.label, 'i-input',
+      () => post('input', { id: i.id }).then(() => toast('Switching to ' + i.label)).catch(e => toast(e.message)))));
+    inp.appendChild(sourceButton('Live TV', 'i-screen', () => post('launch', { pkg: 'com.tcl.tv' }).catch(e => toast(e.message))));
+    const grid = $('#apps'); grid.innerHTML = ''; grid.removeAttribute('aria-busy');
+    apps.forEach(a => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'app'; b.dataset.name = a.label.toLowerCase();
+      const art = document.createElement('span'); art.className = 'art';
+      const src = '/api/icon?pkg=' + encodeURIComponent(a.pkg);
+      const bg = document.createElement('img'); bg.className = 'bg'; bg.alt = '';
+      const fg = document.createElement('img'); fg.className = 'fg'; fg.alt = ''; fg.loading = 'lazy'; fg.src = src;
+      // A square launcher icon, not a TV banner: set it small over a blurred copy of itself.
+      fg.onload = () => { if (fg.naturalWidth < fg.naturalHeight * 1.3) { bg.src = src; b.classList.add('sq'); } };
+      fg.onerror = () => b.classList.add('noart');
+      const mono = document.createElement('span'); mono.className = 'mono'; mono.setAttribute('aria-hidden', 'true');
+      mono.textContent = a.label.trim().charAt(0).toUpperCase();
+      art.append(bg, fg, mono);
+      const name = document.createElement('span'); name.className = 'name'; name.textContent = a.label;
+      b.append(art, name);
+      b.onclick = () => {
+        b.classList.add('opening'); setTimeout(() => b.classList.remove('opening'), 1400);
+        post('launch', { pkg: a.pkg }).then(() => toast('Opening ' + a.label)).catch(e => toast(e.message));
+      };
+      b.oncontextmenu = e => { e.preventDefault(); if (confirm('Force stop ' + a.label + '?')) post('stop', { pkg: a.pkg }).catch(er => toast(er.message)); };
+      grid.appendChild(b);
+    });
+    $('#appCount').textContent = apps.length;
+    appsLoaded = true;
+    filterApps();
+  } catch (e) { toast(e.message); }
+}
+function filterApps() {
+  const raw = $('#appSearch').value.trim(), q = raw.toLowerCase();
+  let shown = 0;
+  $$('#apps .app').forEach(b => { const hit = !q || b.dataset.name.includes(q); b.hidden = !hit; if (hit) shown++; });
+  const empty = $('#appsEmpty');
+  empty.hidden = !appsLoaded || shown > 0;
+  empty.textContent = 'No app matches “' + raw + '”.';
+}
+$('#appSearch').addEventListener('input', filterApps);
+$('#appSearch').addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const first = $$('#apps .app').find(b => !b.hidden);
+  if (first) first.click();
+});
+
+$$('.tabs button').forEach(b => b.addEventListener('click', () => {
+  $$('.tabs button').forEach(x => x.classList.toggle('on', x === b));
+  $$('.view').forEach(v => v.classList.toggle('on', v.id === 'v-' + b.dataset.tab));
+  if (b.dataset.tab === 'files') loadFiles(cwd);
+  if (b.dataset.tab === 'settings') loadSettings();
+}));
+
+// ---------- files
+
+let cwd = '/';
+const fmtSize = n => n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(0) + ' KB'
+  : n < 1073741824 ? (n / 1048576).toFixed(1) + ' MB' : (n / 1073741824).toFixed(2) + ' GB';
+const join = (dir, name) => (dir.endsWith('/') ? dir : dir + '/') + name;
+async function loadFiles(path) {
+  try {
+    const d = await (await api('files?path=' + encodeURIComponent(path))).json();
+    cwd = d.path;
+    const crumbs = $('#crumbs'); crumbs.innerHTML = '';
+    const parts = cwd.split('/').filter(Boolean);
+    const mk = (label, p) => { const b = document.createElement('button'); b.textContent = label; b.onclick = () => loadFiles(p); crumbs.appendChild(b); };
+    mk('Storage', '/');
+    parts.forEach((p, i) => { crumbs.append('›'); mk(p, '/' + parts.slice(0, i + 1).join('/')); });
+    const list = $('#files'); list.innerHTML = '';
+    d.files.filter(f => !f.name.startsWith('.')).forEach(f => {
+      const row = document.createElement('div'); row.className = 'file';
+      const icon = document.createElement('div'); icon.className = f.dir ? 'dir' : '';
+      icon.innerHTML = `<svg aria-hidden="true"><use href="#i-${f.dir ? 'folder' : 'file'}"/></svg>`;
+      const info = document.createElement('div');
+      const name = document.createElement('div'); name.className = 'name'; name.textContent = f.name;
+      const meta = document.createElement('div'); meta.className = 'meta';
+      meta.textContent = (f.dir ? 'Folder' : fmtSize(f.size)) + ', ' + new Date(f.mtime).toLocaleDateString();
+      info.append(name, meta);
+      const more = document.createElement('button'); more.className = 'more'; more.type = 'button'; more.textContent = '⋯'; more.setAttribute('aria-label', 'More for ' + f.name);
+      const p = join(cwd, f.name);
+      name.onclick = () => f.dir ? loadFiles(p) : (location.href = '/api/download?path=' + encodeURIComponent(p));
+      more.onclick = () => fileMenu(f, p);
+      row.append(icon, info, more); list.appendChild(row);
+    });
+    if (!d.files.length) list.innerHTML = '<p class="hint">This folder is empty. Upload a file or drop one here.</p>';
+    $('#ftpHint').textContent = 'Free space ' + fmtSize(d.free) + '. FTP: ftp://' + location.hostname + ':' + d.ftpPort + ' (user tv; the password is on the TV and in Settings).';
+  } catch (e) { toast(e.message); }
+}
+async function fileMenu(f, p) {
+  const isApk = !f.dir && f.name.toLowerCase().endsWith('.apk');
+  const choice = prompt(`${f.name}\n\n1  Download\n2  Rename\n3  Delete${isApk ? '\n4  Install on the TV' : ''}`, '');
+  try {
+    if (choice === '1' && !f.dir) location.href = '/api/download?path=' + encodeURIComponent(p);
+    else if (choice === '2') { const to = prompt('New name', f.name); if (to && to !== f.name) { await post('rename', { path: p, to }); loadFiles(cwd); } }
+    else if (choice === '3') { if (confirm('Delete ' + f.name + (f.dir ? ' and everything in it' : '') + '?')) { await post('delete', { path: p }); loadFiles(cwd); } }
+    else if (choice === '4' && isApk) { toast('Installing…'); toast(await (await post('install', { path: p })).text()); }
+  } catch (e) { toast(e.message); }
+}
+function uploadOne(file) {
+  return new Promise((resolve, reject) => {
+    const x = new XMLHttpRequest();
+    x.open('PUT', '/api/upload?path=' + encodeURIComponent(cwd) + '&name=' + encodeURIComponent(file.name));
+    x.upload.onprogress = e => { if (e.lengthComputable) $('#progress div').style.width = (100 * e.loaded / e.total) + '%'; };
+    x.onload = () => x.status === 200 ? resolve() : reject(new Error(x.responseText || 'Upload failed'));
+    x.onerror = () => reject(new Error('Upload failed'));
+    x.send(file);
+  });
+}
+async function upload(files) {
+  if (!files.length) return;
+  show($('#progress')); $('#progress').style.display = 'block';
+  for (const [i, f] of [...files].entries()) {
+    toast(`Uploading ${f.name} (${i + 1}/${files.length})`); $('#progress div').style.width = '0';
+    try { await uploadOne(f); } catch (e) { toast(f.name + ': ' + e.message); }
+  }
+  $('#progress').style.display = 'none'; toast('Upload finished'); loadFiles(cwd);
+}
+$('#fileInput').addEventListener('change', e => { upload(e.target.files); e.target.value = ''; });
+const drop = $('#v-files');
+['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', e => upload(e.dataTransfer.files));
+$('#mkdirBtn').onclick = async () => { const n = prompt('Folder name'); if (!n) return; try { await post('mkdir', { path: join(cwd, n) }); loadFiles(cwd); } catch (e) { toast(e.message); } };
+$('#refreshBtn').onclick = () => loadFiles(cwd);
+
+// ---------- settings: the theme and support for everyone, the rest for owners
+
+let tvTheme = 'ember';
+function chosenTheme() { try { return localStorage.getItem('ts-theme') || ''; } catch (e) { return ''; } }
+function applyTheme() {
+  const c = chosenTheme(), t = c || tvTheme, root = document.documentElement;
+  if (t === 'ember') delete root.dataset.theme; else root.dataset.theme = t;
+  $$('#themes button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.theme === c)));
+}
+$$('#themes button').forEach(b => b.onclick = () => {
+  try { if (b.dataset.theme) localStorage.setItem('ts-theme', b.dataset.theme); else localStorage.removeItem('ts-theme'); } catch (e) {}
+  applyTheme();
+});
+applyTheme();
+
+const coffee = $('#coffee');
+$('#coffeeBtn').onclick = () => coffee.showModal();
+$('#coffeeClose').onclick = () => coffee.close();
+coffee.addEventListener('click', e => { if (e.target === coffee) coffee.close(); });
+
+let updTimer = null;
+function renderUpdate(u) {
+  const t = $('#updText'), b = $('#updBtn');
+  t.textContent = u.text; t.classList.toggle('failed', u.phase === 'FAILED');
+  b.textContent = u.phase === 'AVAILABLE' ? 'Download and install ' + u.latest : 'Check for updates';
+  b.dataset.install = u.phase === 'AVAILABLE' ? '1' : '';
+  b.disabled = ['CHECKING', 'DOWNLOADING', 'INSTALLING'].includes(u.phase);
+  clearTimeout(updTimer);
+  if (b.disabled) updTimer = setTimeout(loadUpdate, 1000);
+}
+async function loadUpdate() { try { renderUpdate(await (await api('update')).json()); } catch (e) { $('#updText').textContent = e.message; } }
+$('#updBtn').onclick = async () => {
+  const install = $('#updBtn').dataset.install === '1';
+  if (install && !confirm('Install the update? Tasin Shares restarts on the TV and this page reconnects.')) return;
+  try { renderUpdate(await (await post('update', { action: install ? 'install' : 'check' })).json()); } catch (e) { toast(e.message); }
+};
+
+async function loadSettings() {
+  if (!me || !me.owner) return;
+  loadUpdate();
+  try {
+    const s = await (await api('settings')).json();
+    $('#opwState').firstChild.textContent = (s.hasOwnerPassword ? 'An owner password is set. ' : 'No owner password yet. ')
+      + 'Typed on the connect screen, it makes that browser an owner without the TV. It is never shown anywhere; only you know it.';
+    $('#sWeb').value = s.webPort; $('#sFtp').value = s.ftpPort; $('#sPw').value = s.password;
+    const box = $('#owners'); box.innerHTML = '';
+    s.owners.forEach(o => {
+      const row = document.createElement('div'); row.className = 'owner';
+      const t = document.createElement('div');
+      t.innerHTML = '<div></div><div class="hint"></div>';
+      t.children[0].textContent = o.name;
+      t.children[1].textContent = 'Trusted ' + new Date(o.created).toLocaleDateString() + ', last seen ' + new Date(o.lastSeen).toLocaleString();
+      const b = document.createElement('button'); b.textContent = 'Revoke';
+      b.onclick = async () => { if (confirm('Revoke ' + o.name + '? It will need a code again.')) { await post('owners/revoke', { id: o.id }).catch(e => toast(e.message)); loadSettings(); } };
+      row.append(t, b); box.appendChild(row);
+    });
+    if (!s.owners.length) box.innerHTML = '<p class="hint">No owner devices yet.</p>';
+  } catch (e) { toast(e.message); }
+}
+async function setOwnerPw(pw) {
+  try {
+    await post('settings', { ownerPassword: pw }); $('#sOpw').value = '';
+    if (me && !me.owner && pw) {
+      // The first owner password: sign this device in with it, so it becomes the owner straight away.
+      const r = await fetch('/api/owner-login', form({ name: me.name, password: pw }));
+      if (!r.ok) throw new Error(await r.text());
+      toast('You are the owner now'); setTimeout(() => location.reload(), 800); return;
+    }
+    toast(pw ? 'Owner password set' : 'Owner password removed'); loadSettings();
+  }
+  catch (e) { toast(e.message); }
+}
+$('#opwBtn').onclick = () => { const v = $('#sOpw').value; if (v.length < 8) { toast('The owner password needs 8 to 64 characters.'); return; } setOwnerPw(v); };
+$('#opwClear').onclick = () => { if (confirm('Remove the owner password?')) setOwnerPw(''); };
+$('#saveBtn').onclick = async () => {
+  try {
+    const r = await (await post('settings', { webPort: $('#sWeb').value, ftpPort: $('#sFtp').value, password: $('#sPw').value })).json();
+    toast('Saved. Restarting…');
+    if (String(r.webPort) !== location.port) setTimeout(() => { location.href = location.protocol + '//' + location.hostname + ':' + r.webPort + '/'; }, 2500);
+    else setTimeout(() => location.reload(), 2500);
+  } catch (e) { toast(e.message); }
+};
+
+start();
+</script>
+</body>
+</html>

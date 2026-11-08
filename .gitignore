@@ -1,0 +1,13 @@
+.gradle/
+build/
+app/build/
+local.properties
+.hallmark/
+*.jks
+*.keystore
+# local working files, never published
+backup/
+shots/
+work/
+release/
+tools/adbkey
