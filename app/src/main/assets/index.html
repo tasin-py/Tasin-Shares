@@ -161,6 +161,10 @@ main { display: grid; gap: var(--space-lg); }
 .rrow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-xs); margin-bottom: var(--space-xs); }
 .rrow.r4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .rrow.r5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+/* Home, the key a hand looks for first: centred, wider and a little taller than its neighbours */
+.rrow.nav { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr); align-items: center; }
+.rk.home { height: calc(var(--key) + 12px); }
+.rk.home svg { width: 30px; height: 30px; }
 .rk { height: var(--key); display: grid; place-items: center; border-radius: var(--radius-pill); background: var(--color-paper-3); color: var(--color-ink); transition: background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out), transform var(--dur-micro) var(--ease-out); }
 @media (hover: hover) { .rk:hover { background: var(--color-paper-4); } }
 .rk.on { background: var(--color-accent); color: var(--color-accent-ink); }
@@ -320,6 +324,8 @@ body.mini .pad { width: 196px; }
   .remote { padding: var(--space-md); }
   .rrow { gap: var(--space-xs); margin-bottom: var(--space-xs); }
   .rk { height: clamp(52px, 7.5dvh, 64px); }
+  .rk.home { height: calc(clamp(52px, 7.5dvh, 64px) + 12px); }
+  .remote .rk.home svg { width: 32px; height: 32px; }
   .remote svg { width: 24px; height: 24px; }
   .pad { width: min(74vw, 300px); }
   .pad svg { width: 30px; height: 30px; }
@@ -460,12 +466,12 @@ body.mini .watermark { display: none; }
         <button class="r" data-key="22" data-repeat type="button" aria-label="Right"><svg aria-hidden="true"><use href="#i-right"/></svg></button>
         <button class="d" data-key="20" data-repeat type="button" aria-label="Down"><svg aria-hidden="true"><use href="#i-down"/></svg></button>
       </div>
-      <div class="rrow r5">
+      <div class="rrow r5 nav">
         <button class="rk" data-key="4" type="button" title="Back" aria-label="Back"><svg aria-hidden="true"><use href="#i-back"/></svg></button>
-        <button class="rk" data-key="3" type="button" title="Home" aria-label="Home"><svg aria-hidden="true"><use href="#i-home"/></svg></button>
-        <button class="rk" data-key="176" type="button" title="Settings" aria-label="Settings"><svg aria-hidden="true"><use href="#i-settings"/></svg></button>
         <button class="rk" id="lclickBtn" type="button" title="Left click" aria-label="Left click"><svg aria-hidden="true"><use href="#i-lclick"/></svg></button>
-        <button class="rk" id="rclickBtn" type="button" title="Right click" aria-label="Right click"><svg aria-hidden="true"><use href="#i-rclick"/></svg></button>
+        <button class="rk home" data-key="3" type="button" title="Home" aria-label="Home"><svg aria-hidden="true"><use href="#i-home"/></svg></button>
+        <button class="rk" id="rclickBtn" type="button" title="Right click (opens the item's options)" aria-label="Right click"><svg aria-hidden="true"><use href="#i-rclick"/></svg></button>
+        <button class="rk" data-key="176" type="button" title="Settings" aria-label="Settings"><svg aria-hidden="true"><use href="#i-settings"/></svg></button>
       </div>
       <div class="rrow">
         <button class="rk" data-key="25" data-repeat type="button" title="Volume down" aria-label="Volume down"><svg aria-hidden="true"><use href="#i-voldown"/></svg></button>
@@ -1000,9 +1006,16 @@ function setMouseMode(on) {
   if (!on) gyroStop();
 }
 $('#mouseBtn').onclick = () => setMouseMode(!mouseOn);
-$('#rclickBtn').onclick = () => mouseClick(2);
+// Android TV apps mostly ignore a mouse's right button; their right-click is a long press, which opens an
+// item's options. So right-click holds the left button down for 0.7 s at the cursor.
+function rightClick() {
+  if (!mouseReady()) return;
+  mouseButtons(mbtn | 1);
+  setTimeout(() => mouseButtons(mbtn & ~1), 700);
+}
+$('#rclickBtn').onclick = rightClick;
 $('#lclickBtn').onclick = () => mouseClick(1);
-$('#tpRight').onclick = () => mouseClick(2);
+$('#tpRight').onclick = rightClick;
 // Left click: a tap clicks; holding it keeps the button down, so a drag on the trackpad drags.
 const tpLeft = $('#tpLeft');
 tpLeft.addEventListener('pointerdown', e => { if (!mouseReady()) return; tpLeft.setPointerCapture(e.pointerId); mouseButtons(mbtn | 1); });
@@ -1042,14 +1055,14 @@ tp.addEventListener('pointermove', e => {
     const now = performance.now();
     if (ev === 'pointerup' && tpMoved < 10 && now - tpDown < 280) {
       // Two fingers at once: a right-click. One finger: two quick taps make a left click, so a stray tap never clicks.
-      if (tpMax >= 2) { mouseClick(2); lastTap = 0; }
+      if (tpMax >= 2) { rightClick(); lastTap = 0; }
       else if (now - lastTap < 400) { mouseClick(1); lastTap = 0; }
       else lastTap = now;
     }
   }
 }));
 tp.addEventListener('wheel', e => { e.preventDefault(); if (controlling) mouseMove(0, 0, -Math.sign(e.deltaY)); }, { passive: false });
-tp.addEventListener('contextmenu', e => { e.preventDefault(); mouseClick(2); });
+tp.addEventListener('contextmenu', e => { e.preventDefault(); rightClick(); });
 
 // The gyro: the phone's rotation rate moves the cursor, as an air mouse. Turning left and right moves it across,
 // tilting the top up and down moves it up and down. Browsers give sensors only to secure (HTTPS) pages.
