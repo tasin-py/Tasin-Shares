@@ -112,6 +112,10 @@ final class Remote {
                 if (s != null) s.touch(m.getInt("a"), m.optLong("id", -1), m.getInt("x"), m.getInt("y"),
                         m.optInt("ab", 0), m.optInt("b", 0));
                 break;
+            case "mouse":
+                if (s != null) s.mouse(m.optInt("dx", 0), m.optInt("dy", 0), m.optInt("b", 0), m.optInt("w", 0));
+                else p.event("notice", "The mouse needs the remote control connection on the TV.");
+                break;
             case "scroll":
                 if (s != null) s.scroll(m.getInt("x"), m.getInt("y"), (float) m.optDouble("h", 0), (float) m.optDouble("v", 0));
                 break;

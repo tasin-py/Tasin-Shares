@@ -204,6 +204,7 @@ final class WebServer extends NanoWSD {
         o.put("adbError", Adb.lastError());
         o.put("theme", prefs.theme().id);
         o.put("ownerPasswordSet", prefs.hasOwnerPassword());
+        o.put("securePort", LinkService.securePort);
         return json(o.toString());
     }
 

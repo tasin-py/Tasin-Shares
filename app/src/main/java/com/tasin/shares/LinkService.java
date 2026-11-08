@@ -55,7 +55,9 @@ public final class LinkService extends Service implements Access.Listener {
     private Overlay overlay;
     private RemoteButtons buttons;
     private Remote remote;
-    private WebServer web;
+    private WebServer web, secureWeb;
+    /** The HTTPS copy of the page (for the gyro mouse), or 0 when it could not start. */
+    static volatile int securePort;
     private final Ftp ftp = new Ftp();
     private WifiManager.WifiLock wifiLock;
 
@@ -162,6 +164,28 @@ public final class LinkService extends Service implements Access.Listener {
             }
         }
         int webInUse = webPortInUse;
+        // The same page over HTTPS: phone browsers give motion sensors (the gyro mouse) only to secure pages.
+        securePort = 0;
+        try {
+            javax.net.ssl.SSLServerSocketFactory tls = Tls.serverFactory();
+            for (int p = 8443, tries = 0; tries < 20; p++, tries++) {
+                if (p == webInUse || (p >= f && p <= f + 9)) continue;
+                try {
+                    WebServer s = new WebServer(this, prefs, p, access, new TvControl(this, adb), remote,
+                            () -> startService(new Intent(this, LinkService.class).setAction(ACTION_RESTART)));
+                    s.makeSecure(tls, null);
+                    s.start(30000, false);
+                    secureWeb = s;
+                    securePort = p;
+                    break;
+                } catch (Exception e) {
+                    Log.w(TAG, "https server on " + p, e);
+                    if (!portTaken(e)) break;
+                }
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "https certificate", e);
+        }
         new Thread(() -> {
             ftpPortInUse = 0;
             ftpError = "";
@@ -187,6 +211,9 @@ public final class LinkService extends Service implements Access.Listener {
         remote.shutdown();
         if (web != null) web.stop();
         web = null;
+        if (secureWeb != null) secureWeb.stop();
+        secureWeb = null;
+        securePort = 0;
         ftp.stop();
     }
 

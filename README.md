@@ -30,6 +30,7 @@ Everything stays on your local network: no account, no cloud service and no app 
 | | |
 |---|---|
 | **Remote control** | D-pad, OK, back, home, power, input, volume, mute and media keys. Hold to repeat. Type text straight into the TV, and pop the remote out into its own small window. |
+| **Mouse** | A real cursor on the TV, driven from your phone: a trackpad (drag to move, tap twice to click, two fingers to scroll or right-click), Left and Right click keys, and a **gyro mouse** that moves the cursor as you move the phone. |
 | **Live TV screen** | Watch the TV's screen in the browser, and control it with your mouse and keyboard. Play the TV's sound on the TV, on your device, or on both. |
 | **Apps** | Every installed app as a banner shelf, with search. Open any app in one tap, switch to HDMI, AV or Live TV, and force stop an app with a right-click or a long press. |
 | **Files** | Browse the TV's storage, then upload, download, rename, delete or create folders, with drag and drop. Install an APK straight from the file list. A built-in FTP server is there for file managers. |
@@ -44,12 +45,12 @@ Everything stays on your local network: no account, no cloud service and no app 
   <tr>
     <td width="33%"><img src="screenshots/phone-3-remote.png" alt="The remote on a phone"></td>
     <td width="33%"><img src="screenshots/phone-4-apps.png" alt="The app shelf on a phone"></td>
-    <td width="33%"><img src="screenshots/phone-5-files.png" alt="The file browser on a phone"></td>
+    <td width="33%"><img src="screenshots/phone-9-trackpad.png" alt="The trackpad on a phone"></td>
   </tr>
   <tr>
     <td align="center">Remote</td>
     <td align="center">Apps</td>
-    <td align="center">Files</td>
+    <td align="center">Trackpad</td>
   </tr>
   <tr>
     <td><img src="screenshots/phone-2-code.png" alt="The pairing code to allow on the TV"></td>
@@ -164,6 +165,8 @@ From a clone of this repository, `TV_HOST=192.168.0.105 ./install.sh` builds the
 
 | Want to | Do this |
 |---|---|
+| Use the TV with a mouse | Press the mouse key at the top right of the remote. The D-pad turns into a trackpad: drag to move the cursor, tap twice to click, drag two fingers to scroll, and tap with two fingers to right-click. Hold **Left click** while you drag to drag things. The **Left click** and **Right click** keys sit next to Settings on the basic remote too. |
+| Use the gyro mouse | In trackpad mode, press **Gyro**. The first time, the page offers the TV's secure page, because phone browsers share the motion sensor only with secure (HTTPS) pages. Your browser warns once, because the TV made its own certificate; choose **Advanced**, then **Proceed**. Then press **Gyro**, point the top of the phone at the TV, and move it. **Speed** sets how far the cursor goes. |
 | Search on the TV | Open a search box on the TV, type in **Type on the TV**, and press **Send**. It types the text and presses Enter, so the search runs. **Backspace** next to it deletes on the TV, and holding it repeats. |
 | Use the TV with your mouse and keyboard | Press the screen button on the remote, then click into the picture and choose **Keyboard**. |
 | Send files to the TV | Open **Files**, go to any folder (Movies, Music, Download and so on), and drop files on the page, or use FTP: `ftp://<tv-ip>:2121`, user `tv`, with the password shown on the TV. |
@@ -177,6 +180,7 @@ From a clone of this repository, `TV_HOST=192.168.0.105 ./install.sh` builds the
 - Tasin Shares is made for a **trusted home network**. The web page and FTP use plain HTTP and FTP, without TLS.
 - Every new device needs approval on the TV. Only owner devices can change settings, install updates or take over.
 - The owner password is stored only as a salted hash.
+- The secure page (for the gyro mouse) uses a certificate the TV makes for itself. Its key stays in the TV's Android keystore; browsers warn once because no public authority signed it.
 - **Never forward the web or FTP ports to the internet.**
 
 ## Build from source

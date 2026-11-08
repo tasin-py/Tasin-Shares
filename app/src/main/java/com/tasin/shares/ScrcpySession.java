@@ -180,6 +180,43 @@ final class ScrcpySession {
         send(b.array());
     }
 
+    // --- the virtual mouse: a UHID device, so Android sees a real mouse and draws its own cursor
+
+    private static final int MOUSE_ID = 1;
+    /** scrcpy's own HID mouse: 5 buttons, relative X, Y and wheel, then a horizontal wheel (AC Pan). */
+    private static final byte[] MOUSE_DESCRIPTOR = {
+            0x05, 0x01, 0x09, 0x02, (byte) 0xA1, 0x01, 0x09, 0x01, (byte) 0xA1, 0x00,
+            0x05, 0x09, 0x19, 0x01, 0x29, 0x05, 0x15, 0x00, 0x25, 0x01, (byte) 0x95, 0x05, 0x75, 0x01, (byte) 0x81, 0x02,
+            (byte) 0x95, 0x01, 0x75, 0x03, (byte) 0x81, 0x01,
+            0x05, 0x01, 0x09, 0x30, 0x09, 0x31, 0x09, 0x38, 0x15, (byte) 0x81, 0x25, 0x7F, 0x75, 0x08, (byte) 0x95, 0x03, (byte) 0x81, 0x06,
+            0x05, 0x0C, 0x0A, 0x38, 0x02, 0x15, (byte) 0x81, 0x25, 0x7F, 0x75, 0x08, (byte) 0x95, 0x01, (byte) 0x81, 0x06,
+            (byte) 0xC0, (byte) 0xC0};
+    private boolean mouseCreated;
+
+    /** Moves the TV's cursor by dx, dy, with the buttons held (bit 0 left, 1 right, 2 middle) and wheel steps. */
+    synchronized void mouse(int dx, int dy, int buttons, int wheel) throws IOException {
+        if (!mouseCreated) {
+            byte[] name = "Tasin Shares mouse".getBytes(StandardCharsets.UTF_8);
+            ByteBuffer c = ByteBuffer.allocate(1 + 2 + 2 + 2 + 1 + name.length + 2 + MOUSE_DESCRIPTOR.length);
+            c.put((byte) 12).putShort((short) MOUSE_ID).putShort((short) 0).putShort((short) 0)
+                    .put((byte) name.length).put(name).putShort((short) MOUSE_DESCRIPTOR.length).put(MOUSE_DESCRIPTOR);
+            send(c.array());
+            mouseCreated = true;
+        }
+        // A report moves at most 127 each way: split a long move into steps.
+        do {
+            int x = Math.max(-127, Math.min(127, dx)), y = Math.max(-127, Math.min(127, dy));
+            int w = Math.max(-127, Math.min(127, wheel));
+            ByteBuffer b = ByteBuffer.allocate(1 + 2 + 2 + 5);
+            b.put((byte) 13).putShort((short) MOUSE_ID).putShort((short) 5)
+                    .put((byte) (buttons & 0x1f)).put((byte) x).put((byte) y).put((byte) w).put((byte) 0);
+            send(b.array());
+            dx -= x;
+            dy -= y;
+            wheel -= w;
+        } while (dx != 0 || dy != 0 || wheel != 0);
+    }
+
     /** Asks the encoder for a fresh key frame, so a viewer that joins late starts at once. */
     void resetVideo() throws IOException {
         send(new byte[]{17});

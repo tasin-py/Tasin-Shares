@@ -160,6 +160,7 @@ main { display: grid; gap: var(--space-lg); }
 .remote { width: 100%; padding: var(--space-lg); border-radius: var(--radius-card); background: var(--color-paper-2); box-shadow: inset 0 0 0 var(--rule-hair) var(--color-rule); }
 .rrow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-xs); margin-bottom: var(--space-xs); }
 .rrow.r4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.rrow.r5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .rk { height: var(--key); display: grid; place-items: center; border-radius: var(--radius-pill); background: var(--color-paper-3); color: var(--color-ink); transition: background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out), transform var(--dur-micro) var(--ease-out); }
 @media (hover: hover) { .rk:hover { background: var(--color-paper-4); } }
 .rk.on { background: var(--color-accent); color: var(--color-accent-ink); }
@@ -173,6 +174,20 @@ main { display: grid; gap: var(--space-lg); }
 .pad .l, .pad .r { top: 33%; width: 33%; height: 34%; } .pad .l { left: 0; } .pad .r { right: 0; }
 .pad .ok { left: 31%; top: 31%; width: 38%; height: 38%; background: var(--color-accent); color: var(--color-accent-ink); font-weight: 600; font-size: var(--text-lg); }
 @media (hover: hover) { .pad .ok:hover { background: var(--color-accent-2); } }
+/* the trackpad: takes the D-pad's place in the remote */
+.trackpad { display: grid; gap: var(--space-xs); margin: var(--space-md) 0 var(--space-lg); }
+.trackpad.hidden { display: none; }
+#remote.mouse .pad { display: none; }
+#mouseBtn[aria-pressed="true"], #tpGyro[aria-pressed="true"] { background: var(--color-accent); color: var(--color-accent-ink); }
+.tp-surface { position: relative; aspect-ratio: 4 / 3; display: grid; place-items: end center; padding: var(--space-md); border-radius: var(--radius-well); background: var(--color-paper-3); box-shadow: inset 0 0 0 var(--rule-hair) var(--color-rule); touch-action: none; cursor: crosshair; transition: background-color var(--dur-short) var(--ease-out); }
+.tp-surface.active { background: var(--color-paper-4); }
+.tp-surface:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.tp-hint { max-width: 24ch; text-align: center; font-size: var(--text-sm); color: var(--color-muted); pointer-events: none; }
+.tp-buttons { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-xs); }
+.tp-buttons .rk { gap: var(--space-xs); font-size: var(--text-sm); font-weight: 500; display: inline-flex; align-items: center; justify-content: center; }
+.tp-buttons svg { width: 20px; height: 20px; }
+.tp-speed { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--text-sm); color: var(--color-muted); }
+.tp-speed input { flex: 1; min-height: 0; padding: 0; border: 0; background: none; accent-color: var(--color-accent); }
 .type { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: var(--space-xs); margin-top: var(--space-md); }
 .type .bs { width: var(--key); padding: 0; }
 .type input { min-height: var(--key); border-radius: var(--radius-pill); }
@@ -350,6 +365,10 @@ body.mini .watermark { display: none; }
   <symbol id="i-screen" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></symbol>
   <symbol id="i-kbd" viewBox="0 0 24 24"><path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm9 7H8v-2h8v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z"/></symbol>
   <symbol id="i-folder" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></symbol>
+  <symbol id="i-mouse" viewBox="0 0 24 24"><path d="M13 1.07V9h7c0-4.08-3.05-7.44-7-7.93zM4 15c0 4.42 3.58 8 8 8s8-3.58 8-8v-4H4v4zm7-13.93C7.05 1.56 4 4.92 4 9h7V1.07z"/></symbol>
+  <symbol id="i-lclick" viewBox="0 0 24 24"><path d="M11 1.07C7.05 1.56 4 4.92 4 9h7V1.07zM4 15c0 4.42 3.58 8 8 8s8-3.58 8-8v-4H4v4z"/><path opacity=".35" d="M13 1.07V9h7c0-4.08-3.05-7.44-7-7.93z"/></symbol>
+  <symbol id="i-rclick" viewBox="0 0 24 24"><path d="M13 1.07V9h7c0-4.08-3.05-7.44-7-7.93zM4 15c0 4.42 3.58 8 8 8s8-3.58 8-8v-4H4v4z"/><path opacity=".35" d="M11 1.07C7.05 1.56 4 4.92 4 9h7V1.07z"/></symbol>
+  <symbol id="i-gyro" viewBox="0 0 24 24"><path d="M17 1.01 7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/><path d="M1.5 12a6 6 0 0 1 2-4.5l1 1A4.6 4.6 0 0 0 3 12c0 1.3.5 2.5 1.5 3.4l-1 1.1A6 6 0 0 1 1.5 12zm21 0a6 6 0 0 1-2 4.5l-1-1.1A4.6 4.6 0 0 0 21 12c0-1.3-.5-2.5-1.5-3.4l1-1.1a6 6 0 0 1 2 4.5z"/></symbol>
   <symbol id="i-backspace" viewBox="0 0 24 24"><path d="M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3 12.59L17.59 17 14 13.41 10.41 17 9 15.59 12.59 12 9 8.41 10.41 7 14 10.59 17.59 7 19 8.41 15.41 12 19 15.59z"/></symbol>
   <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></symbol>
 </svg>
@@ -417,10 +436,22 @@ body.mini .watermark { display: none; }
     </section>
 
     <section class="remote" id="remote" aria-label="Remote">
-      <div class="rrow">
+      <div class="rrow r4">
         <button class="rk power" data-key="26" type="button" title="Power" aria-label="Power"><svg aria-hidden="true"><use href="#i-power"/></svg></button>
         <button class="rk" data-key="178" type="button" title="Input" aria-label="Input"><svg aria-hidden="true"><use href="#i-input"/></svg></button>
         <button class="rk" id="screenBtn" type="button" title="Show the TV screen" aria-label="Show the TV screen"><svg aria-hidden="true"><use href="#i-screen"/></svg></button>
+        <button class="rk" id="mouseBtn" type="button" title="Trackpad and mouse" aria-label="Trackpad and mouse" aria-pressed="false"><svg aria-hidden="true"><use href="#i-mouse"/></svg></button>
+      </div>
+      <div class="trackpad hidden" id="trackpad">
+        <div class="tp-surface" id="tpSurface" tabindex="0" aria-label="Trackpad: drag to move the TV’s cursor, tap twice to click" role="application">
+          <p class="tp-hint">Drag to move. Tap twice to click. Two fingers to scroll, or tap with two for a right-click.</p>
+        </div>
+        <div class="tp-buttons">
+          <button class="rk" id="tpLeft" type="button" title="Left click (hold to drag)">Left click</button>
+          <button class="rk" id="tpRight" type="button" title="Right click">Right click</button>
+          <button class="rk" id="tpGyro" type="button" title="Move the cursor by moving the phone" aria-pressed="false"><svg aria-hidden="true"><use href="#i-gyro"/></svg>Gyro</button>
+        </div>
+        <label class="tp-speed">Speed <input type="range" id="tpSpeed" min="0.5" max="3" step="0.1" value="1.4"></label>
       </div>
       <div class="pad">
         <button class="u" data-key="19" data-repeat type="button" aria-label="Up"><svg aria-hidden="true"><use href="#i-up"/></svg></button>
@@ -429,10 +460,12 @@ body.mini .watermark { display: none; }
         <button class="r" data-key="22" data-repeat type="button" aria-label="Right"><svg aria-hidden="true"><use href="#i-right"/></svg></button>
         <button class="d" data-key="20" data-repeat type="button" aria-label="Down"><svg aria-hidden="true"><use href="#i-down"/></svg></button>
       </div>
-      <div class="rrow">
+      <div class="rrow r5">
         <button class="rk" data-key="4" type="button" title="Back" aria-label="Back"><svg aria-hidden="true"><use href="#i-back"/></svg></button>
         <button class="rk" data-key="3" type="button" title="Home" aria-label="Home"><svg aria-hidden="true"><use href="#i-home"/></svg></button>
         <button class="rk" data-key="176" type="button" title="Settings" aria-label="Settings"><svg aria-hidden="true"><use href="#i-settings"/></svg></button>
+        <button class="rk" id="lclickBtn" type="button" title="Left click" aria-label="Left click"><svg aria-hidden="true"><use href="#i-lclick"/></svg></button>
+        <button class="rk" id="rclickBtn" type="button" title="Right click" aria-label="Right click"><svg aria-hidden="true"><use href="#i-rclick"/></svg></button>
       </div>
       <div class="rrow">
         <button class="rk" data-key="25" data-repeat type="button" title="Volume down" aria-label="Volume down"><svg aria-hidden="true"><use href="#i-voldown"/></svg></button>
@@ -530,6 +563,14 @@ body.mini .watermark { display: none; }
         <div class="row"><button class="btn" id="coffeeBtn" type="button">Buy me a coffee</button></div>
       </div>
     </section>
+    <dialog id="gyroDlg" aria-labelledby="gyroTitle">
+      <h2 id="gyroTitle">Open the secure page</h2>
+      <p class="hint">Phone browsers share the motion sensor only with secure pages, so the gyro mouse runs on the TV’s secure page. The browser warns once, because the TV made its own certificate: choose Advanced, then Proceed (on iPhone: Show details, then visit this website).</p>
+      <div class="row">
+        <a class="primary" id="gyroOpen" href="#">Open the secure page</a>
+        <button class="btn" id="gyroClose" type="button">Close</button>
+      </div>
+    </dialog>
     <dialog id="coffee" aria-labelledby="coffeeTitle">
       <h2 id="coffeeTitle">Buy me a coffee</h2>
       <p class="hint">Scan the code with your phone’s camera, or open the page.</p>
@@ -932,6 +973,126 @@ $$('[data-key]').forEach(b => {
   b.addEventListener('contextmenu', e => e.preventDefault());
   b.addEventListener('click', e => e.preventDefault());
 });
+// ---------- the mouse: a virtual HID mouse on the TV, driven by the trackpad, the buttons and the gyro
+
+let mouseOn = false, mbtn = 0, accX = 0, accY = 0, accW = 0, mraf = 0;
+const mouseReady = () => {
+  if (MINI) { toast('Open the main page for the mouse.'); return false; }
+  if (!controlling) { toast('Connecting to the TV…'); return false; }
+  return true;
+};
+function mouseFlush() {
+  mraf = 0;
+  const x = Math.trunc(accX), y = Math.trunc(accY), w = Math.trunc(accW);
+  accX -= x; accY -= y; accW -= w;
+  if (x || y || w) send({ t: 'mouse', dx: x, dy: y, b: mbtn, w });
+}
+function mouseMove(dx, dy, w = 0) { accX += dx; accY += dy; accW += w; if (!mraf) mraf = requestAnimationFrame(mouseFlush); }
+function mouseButtons(b) { mbtn = b; send({ t: 'mouse', dx: 0, dy: 0, b: mbtn, w: 0 }); }
+function mouseClick(mask) { if (!mouseReady()) return; mouseButtons(mbtn | mask); setTimeout(() => mouseButtons(mbtn & ~mask), 50); }
+const speed = () => parseFloat($('#tpSpeed').value) || 1.4;
+
+function setMouseMode(on) {
+  mouseOn = on;
+  $('#remote').classList.toggle('mouse', on);
+  show($('#trackpad'), on);
+  $('#mouseBtn').setAttribute('aria-pressed', String(on));
+  if (!on) gyroStop();
+}
+$('#mouseBtn').onclick = () => setMouseMode(!mouseOn);
+$('#rclickBtn').onclick = () => mouseClick(2);
+$('#lclickBtn').onclick = () => mouseClick(1);
+$('#tpRight').onclick = () => mouseClick(2);
+// Left click: a tap clicks; holding it keeps the button down, so a drag on the trackpad drags.
+const tpLeft = $('#tpLeft');
+tpLeft.addEventListener('pointerdown', e => { if (!mouseReady()) return; tpLeft.setPointerCapture(e.pointerId); mouseButtons(mbtn | 1); });
+['pointerup', 'pointercancel'].forEach(ev => tpLeft.addEventListener(ev, () => { if (mbtn & 1) mouseButtons(mbtn & ~1); }));
+
+const tp = $('#tpSurface'), touches = new Map();
+let tpMoved = 0, tpDown = 0, tpMax = 0, tpScroll = 0, lastTap = 0;
+tp.addEventListener('pointerdown', e => {
+  e.preventDefault();
+  if (!mouseReady()) return;
+  tp.setPointerCapture(e.pointerId);
+  touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (touches.size === 1) { tpMoved = 0; tpDown = performance.now(); tpMax = 1; tpScroll = 0; }
+  tpMax = Math.max(tpMax, touches.size);
+  tp.classList.add('active');
+});
+tp.addEventListener('pointermove', e => {
+  const p = touches.get(e.pointerId); if (!p) return;
+  const dx = e.clientX - p.x, dy = e.clientY - p.y;
+  p.x = e.clientX; p.y = e.clientY;
+  tpMoved += Math.abs(dx) + Math.abs(dy);
+  if (touches.size === 1) {
+    // A little acceleration: slow strokes are precise, quick ones cross the screen.
+    const gain = speed() * (1 + Math.min(Math.hypot(dx, dy), 30) / 12);
+    mouseMove(dx * gain, dy * gain);
+  } else {
+    // Two fingers scroll, the natural way: fingers up moves the content up.
+    tpScroll += dy / touches.size;
+    const steps = Math.trunc(tpScroll / 16);
+    if (steps) { tpScroll -= steps * 16; mouseMove(0, 0, steps); }
+  }
+});
+['pointerup', 'pointercancel'].forEach(ev => tp.addEventListener(ev, e => {
+  if (!touches.delete(e.pointerId)) return;
+  if (touches.size === 0) {
+    tp.classList.remove('active');
+    const now = performance.now();
+    if (ev === 'pointerup' && tpMoved < 10 && now - tpDown < 280) {
+      // Two fingers at once: a right-click. One finger: two quick taps make a left click, so a stray tap never clicks.
+      if (tpMax >= 2) { mouseClick(2); lastTap = 0; }
+      else if (now - lastTap < 400) { mouseClick(1); lastTap = 0; }
+      else lastTap = now;
+    }
+  }
+}));
+tp.addEventListener('wheel', e => { e.preventDefault(); if (controlling) mouseMove(0, 0, -Math.sign(e.deltaY)); }, { passive: false });
+tp.addEventListener('contextmenu', e => { e.preventDefault(); mouseClick(2); });
+
+// The gyro: the phone's rotation rate moves the cursor, as an air mouse. Turning left and right moves it across,
+// tilting the top up and down moves it up and down. Browsers give sensors only to secure (HTTPS) pages.
+let gyroOn = false, gyroLast = 0, gyroSeen = false;
+function onMotion(e) {
+  const r = e.rotationRate; if (!r || r.alpha == null) return;
+  gyroSeen = true;
+  const now = performance.now(), dt = gyroLast ? Math.min(0.1, (now - gyroLast) / 1000) : 0.016;
+  gyroLast = now;
+  const dead = v => Math.abs(v) < 2 ? 0 : v; // degrees a second: ignore a resting hand's tremor
+  const k = 18 * speed();
+  mouseMove(-dead(r.alpha) * dt * k, -dead(r.beta) * dt * k);
+}
+function gyroStop() {
+  if (!gyroOn) return;
+  gyroOn = false; window.removeEventListener('devicemotion', onMotion);
+  $('#tpGyro').setAttribute('aria-pressed', 'false');
+}
+$('#tpGyro').onclick = async () => {
+  if (gyroOn) { gyroStop(); return; }
+  if (!mouseReady()) return;
+  if (!window.isSecureContext) {
+    if (me && me.securePort) {
+      $('#gyroOpen').href = 'https://' + location.hostname + ':' + me.securePort + '/?gyro=1';
+      $('#gyroDlg').showModal();
+    } else toast('The TV’s secure page did not start, so the gyro mouse is not available.');
+    return;
+  }
+  if (typeof DeviceMotionEvent === 'undefined') { toast('This device has no motion sensor.'); return; }
+  if (typeof DeviceMotionEvent.requestPermission === 'function') {
+    const ok = await DeviceMotionEvent.requestPermission().catch(() => 'denied');
+    if (ok !== 'granted') { toast('Motion access was not allowed.'); return; }
+  }
+  gyroOn = true; gyroLast = 0; gyroSeen = false;
+  window.addEventListener('devicemotion', onMotion);
+  $('#tpGyro').setAttribute('aria-pressed', 'true');
+  toast('Gyro on: point the top of the phone at the TV and move it.');
+  setTimeout(() => { if (gyroOn && !gyroSeen) { gyroStop(); toast('This device sends no motion data.'); } }, 1500);
+};
+$('#gyroClose').onclick = () => $('#gyroDlg').close();
+// Arrived from the gyro link: open the trackpad, ready for a tap on Gyro (sensors need a tap to start).
+if (new URLSearchParams(location.search).has('gyro')) setTimeout(() => { setMouseMode(true); toast('Tap Gyro to start the gyro mouse.'); }, 600);
+
 $('#typeForm').addEventListener('submit', async e => {
   e.preventDefault();
   const v = $('#typeText').value;
