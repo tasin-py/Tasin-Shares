@@ -148,7 +148,7 @@ From a clone of this repository, `TV_HOST=192.168.0.105 ./install.sh` builds the
 
 1. Open **Tasin Shares** on the TV and choose **Connect remote control**.
 2. On the **Allow debugging?** prompt, tick **Always allow** and choose **Allow**.
-3. Scan the QR code with your phone, or open `http://<tv-ip>:8080` in a browser.
+3. Scan the QR code with your phone, or open the address shown on the TV, usually `http://<tv-ip>:8080`. If another app on the TV already uses port 8080, Tasin Shares moves to the next free port and shows that address instead.
 4. Allow the code that appears on the TV. You're connected.
 
 > **Tip:** reserve the TV's IP address in your router's DHCP settings, so the address and your bookmarks never change.

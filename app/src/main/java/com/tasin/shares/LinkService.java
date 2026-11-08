@@ -28,6 +28,25 @@ public final class LinkService extends Service implements Access.Listener {
 
     static volatile String webError = "";
     static volatile String ftpError = "";
+    /** The ports the servers really listen on: the saved ones, or the next free ones when another app holds those. */
+    private static volatile int webPortInUse, ftpPortInUse;
+
+    static int webPort(Prefs prefs) {
+        return webPortInUse > 0 ? webPortInUse : prefs.webPort();
+    }
+
+    static int ftpPort(Prefs prefs) {
+        return ftpPortInUse > 0 ? ftpPortInUse : prefs.ftpPort();
+    }
+
+    private static boolean portTaken(Throwable e) {
+        for (Throwable t = e; t != null; t = t.getCause()) {
+            if (t instanceof java.net.BindException) return true;
+            String m = String.valueOf(t.getMessage());
+            if (m.contains("EADDRINUSE") || m.contains("Address already in use")) return true;
+        }
+        return false;
+    }
     private static volatile Access accessRef;
 
     private Prefs prefs;
@@ -114,23 +133,47 @@ public final class LinkService extends Service implements Access.Listener {
     }
 
     private void startServers() {
-        try {
-            web = new WebServer(this, prefs, access, new TvControl(this, adb), remote,
-                    () -> startService(new Intent(this, LinkService.class).setAction(ACTION_RESTART)));
-            // Pages ping every 10 s; a socket silent for 30 s is gone.
-            web.start(30000, false);
-            webError = "";
-        } catch (Exception e) {
-            webError = String.valueOf(e.getMessage());
-            Log.w(TAG, "web server", e);
-        }
-        new Thread(() -> {
+        // Another app may already hold the saved port (another web or file server on the TV): move on to the next
+        // free one instead of failing, and show the port actually in use on the TV screen and in its QR code.
+        int f = prefs.ftpPort();
+        webPortInUse = 0;
+        webError = "";
+        for (int p = prefs.webPort(), tries = 0; tries < 20; p++, tries++) {
+            if (p > 65535) break;
+            if (p >= f && p <= f + 9) continue; // never one of FTP's ports
             try {
-                ftp.start(this, prefs);
-                ftpError = "";
-            } catch (Throwable e) {
-                ftpError = String.valueOf(e.getMessage());
-                Log.w(TAG, "ftp server", e);
+                web = new WebServer(this, prefs, p, access, new TvControl(this, adb), remote,
+                        () -> startService(new Intent(this, LinkService.class).setAction(ACTION_RESTART)));
+                // Pages ping every 10 s; a socket silent for 30 s is gone.
+                web.start(30000, false);
+                webPortInUse = p;
+                webError = "";
+                break;
+            } catch (Exception e) {
+                web = null;
+                webError = String.valueOf(e.getMessage());
+                Log.w(TAG, "web server on " + p, e);
+                if (!portTaken(e)) break;
+            }
+        }
+        int webInUse = webPortInUse;
+        new Thread(() -> {
+            ftpPortInUse = 0;
+            ftpError = "";
+            // FTP needs its port and the nine after it for data, so it moves in steps of ten.
+            for (int p = f, tries = 0; tries < 10 && p + 9 <= 65535; p += 10, tries++) {
+                if (webInUse >= p && webInUse <= p + 9) continue;
+                try {
+                    ftp.start(this, prefs, p);
+                    ftpPortInUse = p;
+                    ftpError = "";
+                    break;
+                } catch (Throwable e) {
+                    ftp.stop();
+                    ftpError = String.valueOf(e.getMessage());
+                    Log.w(TAG, "ftp server on " + p, e);
+                    if (!portTaken(e)) break;
+                }
             }
         }, "ftp-start").start();
     }

@@ -39,8 +39,8 @@ final class WebServer extends NanoWSD {
     private final Runnable onSettingsChanged;
     private final File root = Environment.getExternalStorageDirectory();
 
-    WebServer(Context ctx, Prefs prefs, Access access, TvControl tv, Remote remote, Runnable onSettingsChanged) {
-        super(prefs.webPort());
+    WebServer(Context ctx, Prefs prefs, int port, Access access, TvControl tv, Remote remote, Runnable onSettingsChanged) {
+        super(port);
         this.ctx = ctx.getApplicationContext();
         this.prefs = prefs;
         this.access = access;
@@ -429,7 +429,7 @@ final class WebServer extends NanoWSD {
         res.put("path", relative(dir));
         res.put("files", arr);
         res.put("free", root.getUsableSpace());
-        res.put("ftpPort", prefs.ftpPort());
+        res.put("ftpPort", LinkService.ftpPort(prefs));
         return json(res.toString());
     }
 

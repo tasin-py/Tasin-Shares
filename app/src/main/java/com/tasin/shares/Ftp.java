@@ -24,7 +24,7 @@ import java.util.List;
 final class Ftp {
     private FtpServer server;
 
-    synchronized void start(Context ctx, Prefs prefs) throws Exception {
+    synchronized void start(Context ctx, Prefs prefs, int port) throws Exception {
         if (server != null && !server.isStopped()) return;
         PropertiesUserManagerFactory umf = new PropertiesUserManagerFactory();
         File users = new File(ctx.getFilesDir(), "ftpusers.properties");
@@ -48,9 +48,9 @@ final class Ftp {
         um.save(user);
 
         ListenerFactory lf = new ListenerFactory();
-        lf.setPort(prefs.ftpPort());
+        lf.setPort(port);
         DataConnectionConfigurationFactory dc = new DataConnectionConfigurationFactory();
-        dc.setPassivePorts((prefs.ftpPort() + 1) + "-" + (prefs.ftpPort() + 9));
+        dc.setPassivePorts((port + 1) + "-" + (port + 9));
         lf.setDataConnectionConfiguration(dc.createDataConnectionConfiguration());
 
         FtpServerFactory sf = new FtpServerFactory();

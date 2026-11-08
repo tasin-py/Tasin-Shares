@@ -235,17 +235,17 @@ public final class MainActivity extends Activity {
     private void update() {
         String ip = LinkService.address();
         String host = ip == null ? null : ip;
-        String link = ip == null ? null : "http://" + ip + ":" + prefs.webPort() + "/";
+        String link = ip == null ? null : "http://" + ip + ":" + LinkService.webPort(prefs) + "/";
         if (link == null ? qrUrl != null : !link.equals(qrUrl)) {
             qrUrl = link;
             qr.setImageBitmap(link == null ? null : qrCode(link, dp(160)));
             qr.setVisibility(link == null ? View.INVISIBLE : View.VISIBLE);
         }
-        url.setText(host == null ? "No network yet" : host + ":" + prefs.webPort());
+        url.setText(host == null ? "No network yet" : host + ":" + LinkService.webPort(prefs));
         url.setTextColor(host == null ? MUTED : INK);
         showError(urlError, LinkService.webError);
 
-        ftpAddress.setText(host == null ? "No network yet" : "ftp://" + host + ":" + prefs.ftpPort());
+        ftpAddress.setText(host == null ? "No network yet" : "ftp://" + host + ":" + LinkService.ftpPort(prefs));
         ftpUser.setText("User  " + Prefs.FTP_USER);
         ftpPassword.setText("Password  " + prefs.password());
         showError(ftpError, LinkService.ftpError);
