@@ -39,6 +39,7 @@ public final class MainActivity extends Activity {
     private TextView url, urlError, ftpAddress, ftpUser, ftpPassword, ftpError, controller, owners, status;
     private GradientDrawable statusDot;
     private ImageView qr;
+    private TextView connect;
     private String qrUrl;
     private Adb probe;
 
@@ -182,9 +183,13 @@ public final class MainActivity extends Activity {
         root.setClipToPadding(false);
 
         TextView retry = action(actions, "Connect remote control", false);
+        connect = retry;
         retry.setOnClickListener(v -> {
-            probe = new Adb(this);
-            probe.warmUp();
+            if (debuggingOff()) {
+                showDebugHelp();
+                return;
+            }
+            tryConnect();
         });
         TextView receive = action(actions, "Cast a phone or PC", false);
         receive.setOnClickListener(v -> showReceiveHelp());
@@ -261,12 +266,59 @@ public final class MainActivity extends Activity {
         }
         status.setText(text);
         statusDot.setColor(color);
+        connect.setText(debuggingOff() ? "How to turn on debugging" : "Connect remote control");
 
         Access access = LinkService.access();
         Access.Session c = access == null ? null : access.controller();
         controller.setText(c == null ? "Nobody" : c.name + (c.owner ? " (owner)" : ""));
         int n = prefs.ownerCount();
         owners.setText(n == 0 ? "No owner devices" : n == 1 ? "1 owner device" : n + " owner devices");
+    }
+
+    /** The TV refused the connection: debugging (ADB on port 5555) is not turned on. */
+    private static boolean debuggingOff() {
+        return Adb.state() == Adb.State.FAILED && Adb.lastError().startsWith("Network debugging is off");
+    }
+
+    private void tryConnect() {
+        probe = new Adb(this);
+        probe.warmUp();
+        handler.postDelayed(() -> {
+            if (debuggingOff() && !isFinishing()) showDebugHelp();
+        }, 2500);
+    }
+
+    /** Step by step: Developer options on, then USB / network debugging, then allow this app's prompt. */
+    private void showDebugHelp() {
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("Turn on debugging")
+                .setMessage("Tasin Shares controls the TV through the TV's own debugging connection, which is off "
+                        + "until you turn it on. You only do this once.\n\n"
+                        + "1.  Open Settings, then System, then About. Select \"Android TV OS build\" seven times, "
+                        + "until the TV says you are a developer.\n\n"
+                        + "2.  Open Settings, then System, then Developer options. Turn on USB debugging. If the list "
+                        + "also has Network debugging or ADB over network, turn that on as well.\n\n"
+                        + "3.  Come back here and choose Try again. On the \"Allow debugging?\" prompt, tick Always "
+                        + "allow from this computer, then choose Allow.\n\n"
+                        + "Wireless debugging with a pairing code is not enough on its own: the TV must accept "
+                        + "connections on port 5555, which USB debugging or Network debugging turns on.")
+                .setPositiveButton("Try again", (d, w) -> tryConnect())
+                .setNeutralButton("Open Developer options", (d, w) -> openSettings(
+                        android.provider.Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS))
+                .setNegativeButton("Open About", (d, w) -> openSettings(
+                        android.provider.Settings.ACTION_DEVICE_INFO_SETTINGS))
+                .show();
+    }
+
+    private void openSettings(String action) {
+        try {
+            startActivity(new Intent(action));
+        } catch (Exception e) {
+            try {
+                startActivity(new Intent(android.provider.Settings.ACTION_SETTINGS));
+            } catch (Exception ignored) {
+            }
+        }
     }
 
     private void showError(TextView t, String error) {

@@ -39,6 +39,11 @@ final class TvControl {
         adb.exec("input keyevent " + (longPress ? "--longpress " : "") + keycode);
     }
 
+    /** One shell command as the shell user, which may write anywhere in shared storage. */
+    String shell(String command) throws IOException {
+        return adb.exec(command);
+    }
+
     /** Types text into the focused field. `input text` takes ASCII only and needs spaces as %s. */
     void text(String text) throws IOException {
         StringBuilder b = new StringBuilder();

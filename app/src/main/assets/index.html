@@ -173,7 +173,8 @@ main { display: grid; gap: var(--space-lg); }
 .pad .l, .pad .r { top: 33%; width: 33%; height: 34%; } .pad .l { left: 0; } .pad .r { right: 0; }
 .pad .ok { left: 31%; top: 31%; width: 38%; height: 38%; background: var(--color-accent); color: var(--color-accent-ink); font-weight: 600; font-size: var(--text-lg); }
 @media (hover: hover) { .pad .ok:hover { background: var(--color-accent-2); } }
-.type { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-xs); margin-top: var(--space-md); }
+.type { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: var(--space-xs); margin-top: var(--space-md); }
+.type .bs { width: var(--key); padding: 0; }
 .type input { min-height: var(--key); border-radius: var(--radius-pill); }
 .type button { min-height: var(--key); }
 
@@ -349,6 +350,7 @@ body.mini .watermark { display: none; }
   <symbol id="i-screen" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></symbol>
   <symbol id="i-kbd" viewBox="0 0 24 24"><path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm9 7H8v-2h8v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z"/></symbol>
   <symbol id="i-folder" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></symbol>
+  <symbol id="i-backspace" viewBox="0 0 24 24"><path d="M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3 12.59L17.59 17 14 13.41 10.41 17 9 15.59 12.59 12 9 8.41 10.41 7 14 10.59 17.59 7 19 8.41 15.41 12 19 15.59z"/></symbol>
   <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></symbol>
 </svg>
 
@@ -444,8 +446,9 @@ body.mini .watermark { display: none; }
         <button class="rk" data-key="84" type="button" title="Search" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></button>
       </div>
       <form class="type" id="typeForm">
-        <input id="typeText" placeholder="Type on the TV" aria-label="Text to type on the TV" autocomplete="off" autocapitalize="off">
-        <button type="submit" class="btn">Send</button>
+        <input id="typeText" placeholder="Type on the TV" aria-label="Text to type on the TV" autocomplete="off" autocapitalize="off" enterkeyhint="search">
+        <button type="button" class="btn bs" data-key="67" data-repeat title="Backspace on the TV" aria-label="Backspace on the TV"><svg aria-hidden="true"><use href="#i-backspace"/></svg></button>
+        <button type="submit" class="btn" title="Type it on the TV and press Enter">Send</button>
       </form>
     </section>
   </main>
@@ -936,6 +939,8 @@ $('#typeForm').addEventListener('submit', async e => {
   if (!MINI && controlling) send({ t: 'text', s: v });
   else await post('text', { value: v }).catch(err => toast(err.message));
   $('#typeText').value = '';
+  // Then Enter, so a search box on the TV runs the search (the typed text alone only fills it in).
+  setTimeout(() => key(66), 350);
 });
 // arrow keys etc. drive the remote when nothing else has focus and the keyboard passthrough is off
 const RK = { ArrowUp: 19, ArrowDown: 20, ArrowLeft: 21, ArrowRight: 22, Enter: 23, Backspace: 4, Escape: 4 };

@@ -120,9 +120,16 @@ Everything stays on your local network: no account, no cloud service and no app 
 
 ### 1. Turn on debugging on the TV
 
-1. Open **Settings → System → About** and press **OK** on **Android TV OS build** seven times, until Developer options are turned on.
-2. In **Settings → System → Developer options**, turn on **USB debugging**, and **network / ADB debugging** if your TV lists it separately.
-3. Note the TV's IP address under **Settings → Network & Internet**.
+Tasin Shares controls the TV through the TV's own debugging connection (ADB on port 5555). You only set this up once.
+
+1. Open **Settings → System → About**, and select **Android TV OS build** seven times, until the TV says you are a developer.
+2. Open **Settings → System → Developer options**, and turn on **USB debugging**.
+3. If the list also has **Network debugging** or **ADB over network**, turn that on as well.
+4. Note the TV's IP address under **Settings → Network & Internet**.
+
+> **Wireless debugging is not enough on its own.** The Wireless debugging switch on newer TVs uses a pairing code and a random port. Tasin Shares needs the TV to accept connections on port 5555, which USB debugging or Network debugging turns on. That's why Chromecast with Google TV and the Google TV Streamer aren't supported yet.
+
+If debugging is off, the TV's **Connect remote control** button turns into **How to turn on debugging**. It shows these steps, with buttons that open the right Settings screens.
 
 ### 2. Install the APK
 
@@ -157,8 +164,9 @@ From a clone of this repository, `TV_HOST=192.168.0.105 ./install.sh` builds the
 
 | Want to | Do this |
 |---|---|
+| Search on the TV | Open a search box on the TV, type in **Type on the TV**, and press **Send**. It types the text and presses Enter, so the search runs. **Backspace** next to it deletes on the TV, and holding it repeats. |
 | Use the TV with your mouse and keyboard | Press the screen button on the remote, then click into the picture and choose **Keyboard**. |
-| Send files to the TV | Open **Files** and drop files on the page, or use FTP: `ftp://<tv-ip>:2121`, user `tv`, with the password shown on the TV. |
+| Send files to the TV | Open **Files**, go to any folder (Movies, Music, Download and so on), and drop files on the page, or use FTP: `ftp://<tv-ip>:2121`, user `tv`, with the password shown on the TV. |
 | Install an app | Upload the APK in **Files**, then choose **Install** from its menu. |
 | Show a phone or PC screen on the TV | On the TV, choose **Cast a phone or PC** for steps for Windows, Android and Apple devices. |
 | Become the owner | On a new install, the first device you allow can set the owner password in **Settings**, which makes it the owner. Other devices open **I’m the owner** on the connect screen and enter that password. Owner devices reconnect without a code. |

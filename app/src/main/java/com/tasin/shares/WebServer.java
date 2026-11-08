@@ -298,7 +298,8 @@ final class WebServer extends NanoWSD {
                 return upload(s, q.get("path"), q.get("name"));
             case "mkdir":
                 requirePost(post);
-                if (!resolve(q.get("path")).mkdirs()) throw new IOException("could not create the folder");
+                File made = resolve(q.get("path"));
+                if (!made.mkdirs() && !made.isDirectory()) shellOrFail("mkdir -p " + q(made), "could not create the folder");
                 return ok();
             case "delete":
                 requirePost(post);
@@ -308,7 +309,7 @@ final class WebServer extends NanoWSD {
                 requirePost(post);
                 File from = resolve(q.get("path"));
                 File to = new File(from.getParentFile(), safeName(q.get("to")));
-                if (!from.renameTo(to)) throw new IOException("could not rename");
+                if (!from.renameTo(to)) shellOrFail("mv " + q(from) + " " + q(to), "could not rename");
                 return ok();
             }
             case "install": {
@@ -452,7 +453,10 @@ final class WebServer extends NanoWSD {
         String lenHeader = s.getHeaders().get("content-length");
         long remaining = lenHeader == null ? -1 : Long.parseLong(lenHeader);
         if (remaining < 0) throw new IOException("missing Content-Length");
-        File part = new File(dir, "." + dest.getName() + ".part");
+        // The partial file goes to the app's own storage: Android 11+ lets an app without All files access create
+        // only media files in Movies, Music and Pictures, so a ".part" file there is refused.
+        File tmpDir = ctx.getExternalCacheDir() != null ? ctx.getExternalCacheDir() : ctx.getCacheDir();
+        File part = new File(tmpDir, "upload-" + System.nanoTime() + ".part");
         InputStream in = s.getInputStream();
         try (OutputStream out = new FileOutputStream(part)) {
             byte[] buf = new byte[256 * 1024];
@@ -466,9 +470,44 @@ final class WebServer extends NanoWSD {
             part.delete();
             throw e;
         }
-        if (dest.exists()) dest.delete();
-        if (!part.renameTo(dest)) throw new IOException("could not save the file");
+        try {
+            place(part, dest);
+        } finally {
+            part.delete();
+        }
         return ok();
+    }
+
+    /** Moves an upload into place: a rename, else a copy, else through the TV's own ADB (the shell user may write anywhere). */
+    private void place(File part, File dest) throws IOException {
+        if (dest.exists() && !dest.delete()) shellOrFail("rm -f " + q(dest), "could not replace " + dest.getName());
+        if (part.renameTo(dest)) return;
+        try (InputStream in = new java.io.FileInputStream(part); OutputStream out = new FileOutputStream(dest)) {
+            byte[] buf = new byte[256 * 1024];
+            int n;
+            while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+            return;
+        } catch (IOException e) {
+            dest.delete();
+        }
+        part.setReadable(true, false);
+        shellOrFail("cp " + q(part) + " " + q(dest), "could not save the file in this folder");
+        if (!dest.exists()) throw new IOException("could not save the file in this folder");
+    }
+
+    /** Runs a file command through the TV's ADB when Android refused it to the app; any output means it failed. */
+    private void shellOrFail(String command, String error) throws IOException {
+        String out;
+        try {
+            out = tv.shell(command + " 2>&1").trim();
+        } catch (IOException e) {
+            throw new IOException(error + ". Connect the remote control on the TV, which also allows file access.");
+        }
+        if (!out.isEmpty()) throw new IOException(error + ": " + out);
+    }
+
+    private static String q(File f) {
+        return "'" + f.getAbsolutePath().replace("'", "'\\''") + "'";
     }
 
     private File resolve(String rel) throws IOException {
@@ -495,7 +534,7 @@ final class WebServer extends NanoWSD {
         if (f.getCanonicalPath().equals(root.getCanonicalPath())) throw new IOException("refusing to delete storage root");
         File[] children = f.isDirectory() ? f.listFiles() : null;
         if (children != null) for (File c : children) deleteRecursively(c);
-        if (!f.delete()) throw new IOException("could not delete " + f.getName());
+        if (!f.delete() && f.exists()) shellOrFail("rm -rf " + q(f), "could not delete " + f.getName());
     }
 
     // --- helpers

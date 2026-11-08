@@ -20,6 +20,11 @@ public final class ApproveActivity extends Activity {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private String id;
 
+    static boolean isShowing(String requestId) {
+        ApproveActivity a = showing;
+        return a != null && requestId.equals(a.id);
+    }
+
     static void closeIfShowing(String requestId) {
         ApproveActivity a = showing;
         if (a != null && requestId.equals(a.id)) a.runOnUiThread(a::finish);

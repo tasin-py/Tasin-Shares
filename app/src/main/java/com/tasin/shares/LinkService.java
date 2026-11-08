@@ -99,11 +99,16 @@ public final class LinkService extends Service implements Access.Listener {
         new Thread(this::selfSetup, "self-setup").start();
     }
 
-    /** Through its own ADB: the overlay permission for the approval screen and the "controlled by" pill. */
+    /**
+     * Through its own ADB: the overlay permission for the approval screen and the "controlled by" pill, and
+     * All files access, without which Android 11+ refuses files in Movies, Music and the like that are not media.
+     */
     private void selfSetup() {
         try {
             if (!Settings.canDrawOverlays(this))
                 adb.exec("appops set " + getPackageName() + " SYSTEM_ALERT_WINDOW allow");
+            if (Build.VERSION.SDK_INT >= 30 && !android.os.Environment.isExternalStorageManager())
+                adb.exec("appops set " + getPackageName() + " MANAGE_EXTERNAL_STORAGE allow");
         } catch (Exception e) {
             Log.w(TAG, "self setup", e);
         }
@@ -192,16 +197,21 @@ public final class LinkService extends Service implements Access.Listener {
         Intent i = new Intent(this, ApproveActivity.class)
                 .putExtra(ApproveActivity.EXTRA_ID, r.id)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        Runnable viaShell = () -> new Thread(() -> {
+            try {
+                adb.exec("am start -n " + getPackageName() + "/.ApproveActivity --es id " + r.id);
+            } catch (Exception ignored) {
+            }
+        }).start();
         try {
             startActivity(i);
+            // Android may block a start from the background without any error: if the screen is not up in
+            // 1.5 s while the request still waits, ask the shell to open it.
+            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                if (!ApproveActivity.isShowing(r.id) && "pending".equals(r.state)) viaShell.run();
+            }, 1500);
         } catch (Exception e) {
-            // Without the overlay permission a background start can be refused; ask the shell to open it.
-            new Thread(() -> {
-                try {
-                    adb.exec("am start -n " + getPackageName() + "/.ApproveActivity --es id " + r.id);
-                } catch (Exception ignored) {
-                }
-            }).start();
+            viaShell.run();
         }
     }
 
