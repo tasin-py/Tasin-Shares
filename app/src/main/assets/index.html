@@ -1110,8 +1110,7 @@ $('#typeForm').addEventListener('submit', async e => {
   e.preventDefault();
   const v = $('#typeText').value;
   if (!v) { key(66); return; }
-  // The TV types it a character at a time, so nothing is dropped, then presses Enter so a search box runs the search.
-  if (v.length > 40) toast('Typing on the TV…');
+  // The TV pastes a link or long text whole (short text is typed), then presses Enter so a search box runs the search.
   if (!MINI && controlling) send({ t: 'text', s: v, enter: true });
   else await post('text', { value: v, enter: '1' }).catch(err => toast(err.message));
   $('#typeText').value = '';

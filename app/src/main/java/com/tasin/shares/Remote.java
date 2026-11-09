@@ -111,17 +111,7 @@ final class Remote {
                 boolean enter = m.optBoolean("enter");
                 typing.execute(() -> {
                     try {
-                        if (s == null) tv.text(value);
-                        else s.text(value);
-                        if (enter) {
-                            // Enter only once every character has landed, so a search runs on the whole text
-                            ScrcpySession.pause(250);
-                            if (s == null) tv.key(66, false);
-                            else {
-                                s.key(0, 66, 0, 0);
-                                s.key(1, 66, 0, 0);
-                            }
-                        }
+                        type(s, value, enter);
                     } catch (IOException e) {
                         Log.w(TAG, "typing", e);
                     }
@@ -163,12 +153,66 @@ final class Remote {
         synchronized (this) {
             s = session != null && session.running() ? session : null;
         }
-        if (s != null) s.text(value);
-        else tv.text(value);
-        if (enter) {
-            ScrcpySession.pause(250);
-            key(66, false);
+        type(s, value, enter);
+    }
+
+    /**
+     * Puts text into the TV's focused field. A link or any long text goes through the TV's clipboard and a Paste
+     * key, which places it exactly as sent: typed as key presses, a browser's address bar suggests and rewrites while
+     * the keys arrive, and characters get lost. Short text (a search) is typed, which works in every search box.
+     */
+    private void type(ScrcpySession s, String value, boolean enter) throws IOException {
+        if (value.isEmpty()) {
+            // nothing to type
+        } else if (pasteable(value) && setClipboard(value)) {
+            ScrcpySession.pause(120);
+            press(s, 279); // KEYCODE_PASTE
+        } else if (s != null) {
+            s.text(value);
+        } else {
+            tv.text(value);
         }
+        if (enter) {
+            // Enter only once the text is in, so a search or a link runs on the whole of it
+            ScrcpySession.pause(300);
+            press(s, 66);
+        }
+    }
+
+    private static boolean pasteable(String v) {
+        return v.length() > 24 || v.contains("://");
+    }
+
+    private void press(ScrcpySession s, int code) throws IOException {
+        if (s != null) {
+            s.key(0, code, 0, 0);
+            s.key(1, code, 0, 0);
+        } else {
+            tv.key(code, false);
+        }
+    }
+
+    /** Sets the TV's clipboard from the main thread; false if the TV refused. */
+    private boolean setClipboard(String value) {
+        java.util.concurrent.CountDownLatch done = new java.util.concurrent.CountDownLatch(1);
+        boolean[] ok = {false};
+        new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+            try {
+                android.content.ClipboardManager cm =
+                        (android.content.ClipboardManager) ctx.getSystemService(Context.CLIPBOARD_SERVICE);
+                cm.setPrimaryClip(android.content.ClipData.newPlainText("Tasin Shares", value));
+                ok[0] = true;
+            } catch (RuntimeException e) {
+                Log.w(TAG, "clipboard", e);
+            }
+            done.countDown();
+        });
+        try {
+            done.await(2, java.util.concurrent.TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        return ok[0];
     }
 
     private synchronized ScrcpySession current(WebServer.ControlSocket p) {
