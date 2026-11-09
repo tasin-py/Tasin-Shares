@@ -22,6 +22,7 @@ final class Remote {
     private boolean wantVideo;
     private ScrcpySession.Audio wantAudio = ScrcpySession.Audio.TV;
     private int generation;
+    private final java.util.concurrent.ExecutorService typing = java.util.concurrent.Executors.newSingleThreadExecutor();
 
     Remote(Context ctx, Adb adb, TvControl tv) {
         this.ctx = ctx.getApplicationContext();
@@ -104,10 +105,29 @@ final class Remote {
                 }
                 break;
             }
-            case "text":
-                if (s == null) tv.text(m.optString("s"));
-                else s.text(m.optString("s"));
+            case "text": {
+                // Paced typing takes a few seconds for a long link: run it off the socket's thread, one text at a time.
+                String value = m.optString("s");
+                boolean enter = m.optBoolean("enter");
+                typing.execute(() -> {
+                    try {
+                        if (s == null) tv.text(value);
+                        else s.text(value);
+                        if (enter) {
+                            // Enter only once every character has landed, so a search runs on the whole text
+                            ScrcpySession.pause(250);
+                            if (s == null) tv.key(66, false);
+                            else {
+                                s.key(0, 66, 0, 0);
+                                s.key(1, 66, 0, 0);
+                            }
+                        }
+                    } catch (IOException e) {
+                        Log.w(TAG, "typing", e);
+                    }
+                });
                 break;
+            }
             case "touch":
                 if (s != null) s.touch(m.getInt("a"), m.optLong("id", -1), m.getInt("x"), m.getInt("y"),
                         m.optInt("ab", 0), m.optInt("b", 0));
@@ -138,13 +158,17 @@ final class Remote {
         }
     }
 
-    void text(String value) throws IOException {
+    void text(String value, boolean enter) throws IOException {
         ScrcpySession s;
         synchronized (this) {
             s = session != null && session.running() ? session : null;
         }
         if (s != null) s.text(value);
         else tv.text(value);
+        if (enter) {
+            ScrcpySession.pause(250);
+            key(66, false);
+        }
     }
 
     private synchronized ScrcpySession current(WebServer.ControlSocket p) {

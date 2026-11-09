@@ -1110,11 +1110,11 @@ $('#typeForm').addEventListener('submit', async e => {
   e.preventDefault();
   const v = $('#typeText').value;
   if (!v) { key(66); return; }
-  if (!MINI && controlling) send({ t: 'text', s: v });
-  else await post('text', { value: v }).catch(err => toast(err.message));
+  // The TV types it a character at a time, so nothing is dropped, then presses Enter so a search box runs the search.
+  if (v.length > 40) toast('Typing on the TV…');
+  if (!MINI && controlling) send({ t: 'text', s: v, enter: true });
+  else await post('text', { value: v, enter: '1' }).catch(err => toast(err.message));
   $('#typeText').value = '';
-  // Then Enter, so a search box on the TV runs the search (the typed text alone only fills it in).
-  setTimeout(() => key(66), 350);
 });
 // arrow keys etc. drive the remote when nothing else has focus and the keyboard passthrough is off
 const RK = { ArrowUp: 19, ArrowDown: 20, ArrowLeft: 21, ArrowRight: 22, Enter: 23, Backspace: 4, Escape: 4 };

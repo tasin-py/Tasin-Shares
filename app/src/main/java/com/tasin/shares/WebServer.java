@@ -266,7 +266,7 @@ final class WebServer extends NanoWSD {
             case "text":
                 requirePost(post);
                 requireControl(me);
-                remote.text(q.getOrDefault("value", ""));
+                remote.text(q.getOrDefault("value", ""), "1".equals(q.get("enter")));
                 return ok();
             case "launch":
                 requirePost(post);

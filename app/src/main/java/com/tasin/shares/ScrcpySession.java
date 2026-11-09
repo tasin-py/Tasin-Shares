@@ -148,16 +148,30 @@ final class ScrcpySession {
         send(b.array());
     }
 
+    /**
+     * Types text one character at a time, paced. scrcpy turns text into key presses and injects them without
+     * waiting, so a long burst (a pasted link) outruns the TV's keyboard and characters go missing or lose their
+     * Shift. A short pause after each character lets every press land, in order.
+     */
     void text(String text) throws IOException {
-        // scrcpy caps injected text at 300 bytes; send long text in pieces
-        byte[] all = text.getBytes(StandardCharsets.UTF_8);
-        for (int off = 0; off < all.length; ) {
-            int n = Math.min(300, all.length - off);
-            while (n > 0 && off + n < all.length && (all[off + n] & 0xC0) == 0x80) n--; // don't split a character
-            ByteBuffer b = ByteBuffer.allocate(5 + n);
-            b.put((byte) 1).putInt(n).put(all, off, n);
+        for (int i = 0; i < text.length(); ) {
+            int cp = text.codePointAt(i);
+            int n = Character.charCount(cp);
+            byte[] ch = text.substring(i, i + n).getBytes(StandardCharsets.UTF_8);
+            ByteBuffer b = ByteBuffer.allocate(5 + ch.length);
+            b.put((byte) 1).putInt(ch.length).put(ch);
             send(b.array());
-            off += n;
+            i += n;
+            pause(Character.isUpperCase(cp) || !Character.isLetterOrDigit(cp) ? 30 : 18);
+        }
+    }
+
+    static void pause(long ms) throws IOException {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IOException("interrupted");
         }
     }
 

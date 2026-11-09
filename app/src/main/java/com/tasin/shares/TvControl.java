@@ -46,13 +46,24 @@ final class TvControl {
 
     /** Types text into the focused field. `input text` takes ASCII only and needs spaces as %s. */
     void text(String text) throws IOException {
+        // In short pieces: one long `input text` floods the TV's keyboard and drops characters. A piece never ends
+        // on a '%' that the next starts with 's', since `input text` would read "%s" as a space.
         StringBuilder b = new StringBuilder();
-        for (char ch : text.toCharArray()) {
+        int count = 0;
+        for (int i = 0; i < text.length(); i++) {
+            char ch = text.charAt(i);
             if (ch == ' ') b.append("%s");
-            else if (ch >= 0x20 && ch < 0x7f) b.append(ch);
+            else if (ch >= 0x21 && ch < 0x7f) b.append(ch);
+            else continue;
+            count++;
+            boolean next_s = i + 1 < text.length() && text.charAt(i + 1) == 's';
+            if (count >= 6 && !(ch == '%' && next_s)) {
+                adb.exec("input text " + quote(b.toString()));
+                b.setLength(0);
+                count = 0;
+            }
         }
-        if (b.length() == 0) return;
-        adb.exec("input text " + quote(b.toString()));
+        if (b.length() > 0) adb.exec("input text " + quote(b.toString()));
     }
 
     JSONArray apps() throws Exception {
