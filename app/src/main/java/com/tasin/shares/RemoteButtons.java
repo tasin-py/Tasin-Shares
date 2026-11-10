@@ -22,7 +22,7 @@ final class RemoteButtons {
     static {
         BUTTONS.put(0x0f2, "com.tasin.shares");          // Netflix
         BUTTONS.put(0x28b, "com.seraphic.openinet.pre");   // Browser
-        BUTTONS.put(0x0ec, "org.courville.nova");          // Media
+        BUTTONS.put(0x0ec, "com.tasinpy.novaplayerplus");  // Media: Nova Player Plus
         BUTTONS.put(0x0e3, "com.ezviz.tv");                // TCL Channel
         BUTTONS.put(0x2f0, "app.blaze.spofficial");        // Prime Video
     }
